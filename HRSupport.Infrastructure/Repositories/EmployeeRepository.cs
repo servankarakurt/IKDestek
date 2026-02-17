@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Dapper;
+﻿using Dapper;
 using HRSupport.Application.Interfaces;
 using HRSupport.Domain.Entites;
 using HRSupport.Infrastructure.Context;
+using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace HRSupport.Infrastructure.Repositories
@@ -56,12 +56,12 @@ namespace HRSupport.Infrastructure.Repositories
         public async Task<Employee> DeleteAsync(int id)
         {
             var query = @"UPDATE Employees SET isDelete = 1 WHERE Id = @Id AND isDelete==0";
-            using (var connection = _context.CreateConnection()) 
+            using (var connection = _context.CreateConnection())
             {
                 await connection.ExecuteAsync(query, new { Id = id });
                 return await GetByIdAsync(id);
             }
         }
-    } 
+    }
 }
 

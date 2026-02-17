@@ -2,37 +2,28 @@ namespace HRSupport.Application.Common
 {
     public class Result<T>
     {
-        public bool Succeeded { get; set; }
-        public string Message { get; set; }
-        public T Data { get; set; }
-        public List<string> Errors { get; set; }
-        public bool IsSuccess => Succeeded;
-        public T Value=>Data;
-        public List<string> Error => Errors;
-        public Result()
+        public bool IsSuccess { get; private set; }
+        public T Value { get; private set; }
+        public string Error { get; private set; }
+        public List<string> Errors { get; private set; }
+        private Result(bool isSuccess, T value, string error, List<string> errors)
         {
-            Errors = new List<string>();
-        }
-        public Result(T data, string Message)        {
-            Succeeded = true;
-            Message = message;
-            Data = data;
-            Errors = null;
-        }
-        public Result( List<string> errors,string message)
-        {
-            Succeeded = true;
-            Message = message;
-            Data= default;
+            IsSuccess = isSuccess;
+            Value = value;
+            Error = error;
             Errors = errors;
         }
-        public static Result<T> Success(T data, string message = "iþlem baþarýlý")
+        public static Result<T> Success(T value, string message = null)
         {
-            return new Result<T> { Succeeded = true, Data = data, Message = message };
+            return new Result<T>(true, value, message, null);
         }
-        public static Result<T> Failure(List<string> errors, string message = "iþlem baþarýsýz")
+        public static Result<T> Failure(string error)
         {
-            return new Result<T>(errors, message);
+            return new Result<T>(false, default(T), error, null);
+        }
+        public static Result<T> Failure(List<string> errors)
+        {
+            return new Result<T>(false, default(T), null, errors);
         }
     }
 }

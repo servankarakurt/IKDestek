@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using HRSupport.Application.Common;
+﻿using HRSupport.Application.Common;
 using HRSupport.Application.Interfaces;
 using MediatR;
 
 namespace HRSupport.Application.Features.Employee.Commans
 {
-    public class CreateEmployeeHandler:IRequestHandler<CreateEmployeeCommand, Result<int>>
+    public class CreateEmployeeHandler : IRequestHandler<CreateEmployeeCommand, Result<int>>
     {
-      private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeRepository _employeeRepository;
         public CreateEmployeeHandler(IEmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
@@ -29,8 +25,9 @@ namespace HRSupport.Application.Features.Employee.Commans
                 Deparment = request.Deparment,
                 Roles = request.Roles
             };
-           var newId= await _employeeRepository.AddAsync(employee);
+            var newId = await _employeeRepository.AddAsync(employee);
             return Result<int>.Success(employee.Id, "Çalışan başarılı şekilde kaydedildi");
+
         }
     }
 }
