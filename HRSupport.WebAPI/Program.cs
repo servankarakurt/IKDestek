@@ -4,6 +4,8 @@ using MediatR;
 using System.Reflection;
 using HRSupport.Application.Features.Employee.Commans;
 using HRSupport.Application.Interfaces;
+using HRSupport.Application.Common;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,15 +15,14 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddScoped<IEmployeeRepository>();
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(HRSupport.Application.AssemblyReference).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateEmployeeCommand).Assembly));
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
 }
-app.UseHttpsRecdirect();
-app.useauthorization();
+app.UseHttpsRedirection();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
