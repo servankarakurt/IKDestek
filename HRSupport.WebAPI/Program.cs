@@ -1,7 +1,7 @@
-using HRSupport.Application.Features.Employee.Commans;
+using HRSupport.Application.Features.Commans;
 using HRSupport.Application.Interfaces;
 using HRSupport.Infrastructure.Context;
-
+using HRSupport.Application.Features.Employee.Commans;
 
 
 var builder = WebApplication.CreateBuilder(args);

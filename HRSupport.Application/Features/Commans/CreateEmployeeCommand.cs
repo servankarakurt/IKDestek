@@ -2,7 +2,7 @@
 using HRSupport.Domain.Common;
 using MediatR;
 
-namespace HRSupport.Application.Features.Employee.Commans
+namespace HRSupport.Application.Features.Commans
 {
     public class CreateEmployeeCommand : IRequest<Result<int>>
     {

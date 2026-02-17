@@ -1,6 +1,11 @@
-﻿using HRSupport.Application.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using HRSupport.Application.Common;
 using HRSupport.Application.Interfaces;
 using MediatR;
+using HRSupport.Domain; 
 
 namespace HRSupport.Application.Features.Employee.Commans
 {
@@ -25,9 +30,11 @@ namespace HRSupport.Application.Features.Employee.Commans
                 Deparment = request.Deparment,
                 Roles = request.Roles
             };
-            var newId = await _employeeRepository.AddAsync(employee);
-            return Result<int>.Success(employee.Id, "Çalışan başarılı şekilde kaydedildi");
 
+            
+            var newId = await _employeeRepository.AddAsync(employee);
+
+            return Result<int>.Success(newId, "Çalışan başarılı şekilde kaydedildi");
         }
     }
 }

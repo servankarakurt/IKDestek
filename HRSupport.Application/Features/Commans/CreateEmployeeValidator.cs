@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace HRSupport.Application.Features.Employee.Commans
+namespace HRSupport.Application.Features.Commans
 {
     public class CreateEmployeeValidator : AbstractValidator<CreateEmployeeCommand>
     {
