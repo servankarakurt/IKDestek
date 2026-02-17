@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="HRSupport.Application/HRSupport.Application.csproj" />
+  <Project Path="HRSupport.Domain/HRSupport.Domain.csproj" />
+  <Project Path="HRSupport.Infrastructure/HRSupport.Infrastructure.csproj" />
+  <Project Path="HRSupport.WebAPI/HRSupport.WebAPI.csproj" />
+</Solution>
