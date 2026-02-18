@@ -1,7 +1,7 @@
-﻿using Dapper;
-using HRSupport.Application.Interfaces;
+﻿using HRSupport.Application.Interfaces;
 using HRSupport.Domain.Entites;
 using HRSupport.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,77 +9,52 @@ namespace HRSupport.Infrastructure.Repositories
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        private readonly DapperContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public EmployeeRepository(DapperContext context)
+        public EmployeeRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
         public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
         {
-            var query = "SELECT * FROM Employeess WHERE IsDeleted = 0";
-
-            using (var connection = _context.CreateConnection())
-            {
-                return await connection.QueryAsync<Employee>(query);
-            }
+            // DbContext içindeki HasQueryFilter sayesinde silinmiş olanlar otomatik elenecek
+            return await _context.Employeess.ToListAsync();
         }
 
         public async Task<Employee> GetByIdAsync(int id)
         {
-          
-            var query = "SELECT * FROM Employeess WHERE Id = @Id AND IsDeleted = 0";
-            using (var connection = _context.CreateConnection())
-            {
-                return await connection.QuerySingleOrDefaultAsync<Employee>(query, new { Id = id });
-            }
+            return await _context.Employeess.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<int> AddAsync(Employee entity)
         {
-            
-            var query = @"INSERT INTO Employeess (FirstName, LastName, Email, Phone, CardID, BirthDate, StartDate, Department, Roles)
-                          VALUES (@FirstName, @LastName, @Email, @Phone, @CardID, @BirthDate, @StartDate, @Deparment, @Roles);
-                          SELECT CAST(SCOPE_IDENTITY() as int)";
+            await _context.Employeess.AddAsync(entity);
+            await _context.SaveChangesAsync();
 
-            using (var connection = _context.CreateConnection())
-            {
-                return await connection.QuerySingleAsync<int>(query, entity);
-            }
+            // EF Core ekleme işleminden sonra Identity(Id) değerini otomatik olarak entity'e atar
+            return entity.Id;
         }
 
         public async Task<Employee> UpdateAsync(Employee employee)
         {
-            
-            var query = @"UPDATE Employeess
-                          SET FirstName = @FirstName,
-                              LastName = @LastName,
-                              Email = @Email,
-                              Phone = @Phone,
-                              CardID = @CardID,
-                              BirthDate = @BirthDate,
-                              StartDate = @StartDate,
-                              Department = @Deparment,
-                              Roles = @Roles 
-                          WHERE Id = @Id AND IsDeleted = 0";
-
-            using (var connection = _context.CreateConnection())
-            {
-                await connection.ExecuteAsync(query, employee);
-                return employee;
-            }
+            _context.Employeess.Update(employee);
+            await _context.SaveChangesAsync();
+            return employee;
         }
 
         public async Task<Employee> DeleteAsync(int id)
-        { 
-            var query = "UPDATE Employeess SET IsDeleted = 1 WHERE Id = @Id";
-
-            using (var connection = _context.CreateConnection())
+        {
+            // Soft delete işlemi
+            var employee = await _context.Employeess.FirstOrDefaultAsync(x => x.Id == id);
+            if (employee != null)
             {
-                await connection.ExecuteAsync(query, new { Id = id });
-                return null;
+                employee.IsDeleted = true; // Sadece bayrağı güncelliyoruz
+                _context.Employeess.Update(employee);
+                await _context.SaveChangesAsync();
+                return employee;
             }
+            return null;
         }
     }
 }
