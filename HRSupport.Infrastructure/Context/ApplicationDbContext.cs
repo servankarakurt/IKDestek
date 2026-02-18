@@ -1,5 +1,6 @@
 ﻿using HRSupport.Domain.Entites;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace HRSupport.Infrastructure.Context
 {
@@ -11,6 +12,9 @@ namespace HRSupport.Infrastructure.Context
 
         public DbSet<Employee> Employeess { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; } 
+        public DbSet<Intern> Interns { get; set; }
+        public DbSet<User> Users { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,8 +51,10 @@ namespace HRSupport.Infrastructure.Context
                 .Property(e => e.CreatedTime)
                 .HasColumnName("Createdate");
 
-            // GLOBAL QUERY FILTER: Sadece silinmemiş olan izin taleplerini getir
+            
             modelBuilder.Entity<LeaveRequest>().HasQueryFilter(e => !e.IsDeleted);
+
+
         }
     }
 }
