@@ -12,8 +12,6 @@ namespace HRSupport.Infrastructure.Context
         public DapperContext(IConfiguration configuration)
         {
             _configuration = configuration;
-            // DÜZELTME: appsettings.json dosyasından bağlantı adresini okuyoruz.
-            // Buradaki "SqlConnection" isminin appsettings.json dosyanla aynı olduğundan emin ol.
             _connectionString = _configuration.GetConnectionString("SqlConnection");
         }
 

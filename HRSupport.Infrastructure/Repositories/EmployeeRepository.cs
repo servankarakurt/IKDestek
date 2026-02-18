@@ -16,10 +16,10 @@ namespace HRSupport.Infrastructure.Repositories
             _context = context;
         }
 
-        // DÜZELTME: Interface'deki isim 'GetAllEmployeesAsync' olduğu için burayı değiştirdik.
+        
         public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
         {
-            var query = "SELECT * FROM Employees WHERE isDelete = 0";
+            var query = "SELECT * FROM Employeess WHERE isDelete = 0";
 
             using (var connection = _context.CreateConnection())
             {
@@ -29,8 +29,7 @@ namespace HRSupport.Infrastructure.Repositories
 
         public async Task<Employee> GetByIdAsync(int id)
         {
-            var query = "SELECT * FROM Employees WHERE Id = @Id AND isDelete = 0";
-
+            var query = "SELECT * FROM Employeess WHERE Id = @Id AND isDelete = 0";
             using (var connection = _context.CreateConnection())
             {
                 return await connection.QuerySingleOrDefaultAsync<Employee>(query, new { Id = id });
@@ -39,7 +38,7 @@ namespace HRSupport.Infrastructure.Repositories
 
         public async Task<int> AddAsync(Employee entity)
         {
-            var query = @"INSERT INTO Employees (FirstName, LastName, Email, Phone, CardID, BirthDate, StartDate, Department, Roles, CreatedDate, isActive, isDeleted)
+            var query = @"INSERT INTO Employeess (FirstName, LastName, Email, Phone, CardID, BirthDate, StartDate, Department, Roles, CreatedDate, isActive, isDeleted)
                           VALUES (@FirstName, @LastName, @Email, @Phone, @CardID, @BirthDate, @StartDate, @Department, @Roles, @CreatedDate, @isActive, @isDeleted);
                           SELECT CAST(SCOPE_IDENTITY() as int)";
 
@@ -51,7 +50,7 @@ namespace HRSupport.Infrastructure.Repositories
 
         public async Task<Employee> UpdateAsync(Employee employee)
         {
-            var query = @"UPDATE Employees 
+            var query = @"UPDATE Employeess
                           SET FirstName = @FirstName,
                               LastName = @LastName,
                               Email = @Email,
@@ -72,7 +71,7 @@ namespace HRSupport.Infrastructure.Repositories
 
         public async Task<Employee> DeleteAsync(int id)
         {
-            var query = "UPDATE Employees SET isDelete = 1 WHERE Id = @Id";
+            var query = "UPDATE Employeess SET isDelete = 1 WHERE Id = @Id";
 
             using (var connection = _context.CreateConnection())
             {
