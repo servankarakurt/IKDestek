@@ -1,7 +1,6 @@
-using HRSupport.Application.Features.Commans;
 using HRSupport.Application.Interfaces;
 using HRSupport.Infrastructure.Context;
-using HRSupport.Application.Features.Employee.Commans;
+using HRSupport.Application.Features.Employees.Commans;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +15,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
+    app.UseRouting();
+    app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
 app.UseAuthorization();

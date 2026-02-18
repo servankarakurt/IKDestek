@@ -1,6 +1,6 @@
 ﻿namespace HRSupport.WebAPI.Controllers
 {
-    using HRSupport.Application.Features.Commans;
+    using HRSupport.Application.Features.Employees.Commans;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
     [ApiController]

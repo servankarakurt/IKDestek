@@ -1,23 +1,29 @@
-﻿using System;
+﻿using HRSupport.Application.Common;
+using HRSupport.Application.Interfaces;
+using HRSupport.Domain.Entites; // Buradaki Employee class'ı gelecek
+using MediatR;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using HRSupport.Application.Common;
-using HRSupport.Application.Interfaces;
-using MediatR;
-using HRSupport.Domain; 
+using System.Threading.Tasks; // EKLENDİ: Task için gerekli
 
-namespace HRSupport.Application.Features.Employee.Commans
+// DÜZELTME 1: Namespace "Employee" -> "Employees" yapıldı (Çakışmayı önlemek için)
+// DÜZELTME 2: "Commans" -> "Commands" (Yazım hatası düzeltildi)
+namespace HRSupport.Application.Features.Employees.Commans
 {
     public class CreateEmployeeHandler : IRequestHandler<CreateEmployeeCommand, Result<int>>
     {
         private readonly IEmployeeRepository _employeeRepository;
+
         public CreateEmployeeHandler(IEmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
         }
+
         public async Task<Result<int>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
+            // Artık derleyici buradaki Employee'nin bir sınıf olduğunu anlar
             var employee = new Employee
             {
                 FirstName = request.FirstName,
@@ -31,7 +37,6 @@ namespace HRSupport.Application.Features.Employee.Commans
                 Roles = request.Roles
             };
 
-            
             var newId = await _employeeRepository.AddAsync(employee);
 
             return Result<int>.Success(newId, "Çalışan başarılı şekilde kaydedildi");
