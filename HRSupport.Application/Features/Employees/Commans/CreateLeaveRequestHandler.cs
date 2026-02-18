@@ -1,47 +1,44 @@
 ﻿using HRSupport.Application.Common;
+using HRSupport.Application.Features.Employees.Commans;
 using HRSupport.Application.Interfaces;
 using HRSupport.Domain.Entites;
-using HRSupport.Domain.Common;
+using HRSupport.Domain.Enum;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
-using HRSupport.Domain.Enum;
 
-namespace HRSupport.Application.Features.Commands
+namespace HRSupport.Application.Features.Employees.Commans
+{
+    public class CreateLeaveRequestHandler : IRequestHandler<CreateLeaveRequestCommand, Result<int>>
     {
-        public class CreateLeaveRequestHandler : IRequestHandler<CreateLeaveRequestCommand, Result<int>>
+        private readonly ILeaveRequestRepository _leaveRequestRepository;
+        private readonly IEmployeeRepository _employeeRepository;
+
+        public CreateLeaveRequestHandler(ILeaveRequestRepository leaveRequestRepository, IEmployeeRepository employeeRepository)
         {
-            private readonly ILeaveRequestRepository _leaveRequestRepository;
-            private readonly IEmployeeRepository _employeeRepository;
+            _leaveRequestRepository = leaveRequestRepository;
+            _employeeRepository = employeeRepository;
+        }
 
-            public CreateLeaveRequestHandler(ILeaveRequestRepository leaveRequestRepository, IEmployeeRepository employeeRepository)
+        public async Task<Result<int>> Handle(CreateLeaveRequestCommand request, CancellationToken cancellationToken)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(request.EmployeeId);
+            if (employee == null) return Result<int>.Failure("Personel bulunamadı.");
+
+            if (request.StartDate > request.EndDate) return Result<int>.Failure("Başlangıç tarihi bitişten büyük olamaz.");
+
+            var leaveRequest = new LeaveRequest
             {
-                _leaveRequestRepository = leaveRequestRepository;
-                _employeeRepository = employeeRepository;
-            }
+                EmployeeId = request.EmployeeId,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                Type = request.Type,
+                Status = LeaveStatus.Beklemede,
+                Description = request.Description
+            };
 
-            public async Task<Result<int>> Handle(CreateLeaveRequestCommand request, CancellationToken cancellationToken)
-            {
-               
-                var employee = await _employeeRepository.GetByIdAsync(request.EmployeeId);
-                if (employee == null) return Result<int>.Failure("Personel bulunamadı.");
-
-                if (request.StartDate > request.EndDate) return Result<int>.Failure("Başlangıç tarihi bitişten büyük olamaz.");
-
-                var leaveRequest = new LeaveRequest
-                {
-                    EmployeeId = request.EmployeeId,
-                    StartDate = request.StartDate,
-                    EndDate = request.EndDate,
-                    Type = request.Type,
-                    Status = LeaveStatus.Beklemede, 
-                    Description = request.Description
-                };
-
-                var newId = await _leaveRequestRepository.AddAsync(leaveRequest);
-                return Result<int>.Success(newId, "İzin talebi başarıyla oluşturuldu ve onaya sunuldu.");
-            }
+            var newId = await _leaveRequestRepository.AddAsync(leaveRequest);
+            return Result<int>.Success(newId, "İzin talebi başarıyla oluşturuldu ve onaya sunuldu.");
         }
     }
-}
 }

@@ -19,7 +19,7 @@ namespace HRSupport.Infrastructure.Context
             // ==========================================
             // 1. EMPLOYEE (ÇALIŞAN) TABLOSU AYARLARI
             // ==========================================
-            modelBuilder.Entity<Employee>().ToTable("Employees"); // Tablo adını doğru eşleştiriyoruz
+            modelBuilder.Entity<Employee>().ToTable("Employees"); 
 
             // EF Core'un bu property'i veritabanında sütun olarak aramamasını sağlıyoruz
             modelBuilder.Entity<Employee>().Ignore(e => e.fullname);

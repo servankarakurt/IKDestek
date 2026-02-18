@@ -1,4 +1,4 @@
-﻿using HRSupport.Application.Features.LeaveRequests.Commands;
+﻿using HRSupport.Application.Features.Employees.Commans; // Doğru namespace eklendi
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -17,7 +17,7 @@ namespace HRSupport.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateLeaveRequest(HRSupport.Application.Features.Commands.CreateLeaveRequestCommand command)
+        public async Task<IActionResult> CreateLeaveRequest(CreateLeaveRequestCommand command)
         {
             var result = await _mediator.Send(command);
             if (result.IsSuccess) return Ok(result);
