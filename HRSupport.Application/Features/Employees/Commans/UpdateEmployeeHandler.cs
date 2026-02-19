@@ -18,7 +18,6 @@ namespace HRSupport.Application.Features.Employees.Commans
 
         public async Task<Result<int>> Handle(UpdateEmployeeCommand request, CancellationToken cancellationToken)
         {
-            
             var existingEmployee = await _employeeRepository.GetByIdAsync(request.Id);
 
             if (existingEmployee == null)
@@ -26,7 +25,6 @@ namespace HRSupport.Application.Features.Employees.Commans
                 return Result<int>.Failure("Güncellenmek istenen çalışan bulunamadı.");
             }
 
-           
             existingEmployee.FirstName = request.FirstName;
             existingEmployee.LastName = request.LastName;
             existingEmployee.Email = request.Email;
@@ -34,10 +32,11 @@ namespace HRSupport.Application.Features.Employees.Commans
             existingEmployee.CardID = request.CardID;
             existingEmployee.BirthDate = request.BirthDate;
             existingEmployee.StartDate = request.StartDate;
-            existingEmployee.Deparment = request.Deparment;
+
+            // Hem Employee entity'sinde hem de Command'da artık isim 'Department'
+            existingEmployee.Department = request.Department;
             existingEmployee.Roles = request.Roles;
 
-            
             await _employeeRepository.UpdateAsync(existingEmployee);
 
             return Result<int>.Success(existingEmployee.Id, "Çalışan bilgileri başarıyla güncellendi.");

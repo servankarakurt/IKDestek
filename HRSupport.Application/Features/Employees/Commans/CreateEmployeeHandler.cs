@@ -1,15 +1,10 @@
 ﻿using HRSupport.Application.Common;
 using HRSupport.Application.Interfaces;
-using HRSupport.Domain.Entites; // Buradaki Employee class'ı gelecek
+using HRSupport.Domain.Entites;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks; // EKLENDİ: Task için gerekli
+using System.Threading.Tasks;
 
-// DÜZELTME 1: Namespace "Employee" -> "Employees" yapıldı (Çakışmayı önlemek için)
-// DÜZELTME 2: "Commans" -> "Commands" (Yazım hatası düzeltildi)
 namespace HRSupport.Application.Features.Employees.Commans
 {
     public class CreateEmployeeHandler : IRequestHandler<CreateEmployeeCommand, Result<int>>
@@ -23,7 +18,6 @@ namespace HRSupport.Application.Features.Employees.Commans
 
         public async Task<Result<int>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
-            // Artık derleyici buradaki Employee'nin bir sınıf olduğunu anlar
             var employee = new Employee
             {
                 FirstName = request.FirstName,
@@ -33,7 +27,8 @@ namespace HRSupport.Application.Features.Employees.Commans
                 CardID = request.CardID,
                 BirthDate = request.BirthDate,
                 StartDate = request.StartDate,
-                Deparment = request.Deparment,
+                // 'Deparment' yerine 'Department' olarak düzeltildi
+                Department = request.Department,
                 Roles = request.Roles
             };
 

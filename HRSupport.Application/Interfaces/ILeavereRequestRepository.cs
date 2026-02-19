@@ -5,6 +5,10 @@ namespace HRSupport.Application.Interfaces
 {
     public interface ILeaveRequestRepository
     {
-        Task<int> AddAsync(LeaveRequest entity);
+        Task<IEnumerable<LeaveRequest>> GetAllAsync();
+        Task<LeaveRequest?> GetByIdAsync(int id);
+        Task<int> AddAsync(LeaveRequest leaveRequest);
+        Task UpdateAsync(LeaveRequest leaveRequest); // Durum güncellemesi için eklendi
+        Task<IEnumerable<LeaveRequest>> GetPendingRequestsAsync();
     }
 }

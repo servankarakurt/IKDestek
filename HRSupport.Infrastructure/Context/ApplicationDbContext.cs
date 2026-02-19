@@ -30,7 +30,7 @@ namespace HRSupport.Infrastructure.Context
 
             // İsim uyuşmazlıklarını çözüyoruz
             modelBuilder.Entity<Employee>()
-                .Property(e => e.Deparment)
+                .Property(e => e.Department)
                 .HasColumnName("Department");
 
             modelBuilder.Entity<Employee>()

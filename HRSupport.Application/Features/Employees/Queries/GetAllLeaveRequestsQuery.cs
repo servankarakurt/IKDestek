@@ -5,7 +5,8 @@ using System.Collections.Generic;
 
 namespace HRSupport.Application.Features.Employees.Queries
 {
-    public class GetAllEmployeesQuery : IRequest<Result<IEnumerable<EmployeeDto>>>
+    // Tüm izin taleplerini listeleyecek olan ve geriye LeaveRequestDto listesi dönen sorgumuz
+    public class GetAllLeaveRequestsQuery : IRequest<Result<IEnumerable<LeaveRequestDto>>>
     {
     }
 }

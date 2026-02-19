@@ -13,7 +13,7 @@ namespace HRSupport.Application.Features.Employees.Commans
         public int CardID { get; set; }
         public DateTime BirthDate { get; set; }
         public DateTime StartDate { get; set; }
-        public Department Deparment { get; set; }
+        public Department Department { get; set; }
         public Roles Roles { get; set; }
 
 

@@ -1,28 +1,33 @@
-﻿using HRSupport.Application.Common;
+﻿using AutoMapper;
+using HRSupport.Application.Common;
+using HRSupport.Application.DTOs;
 using HRSupport.Application.Interfaces;
-using HRSupport.Domain.Entites;
 using MediatR;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace HRSupport.Application.Features.Employees.Queries
 {
-    public class GetAllEmployeesHandler : IRequestHandler<GetAllEmployeesQuery, Result<IEnumerable<Employee>>>
+    public class GetAllEmployeesHandler : IRequestHandler<GetAllEmployeesQuery, Result<IEnumerable<EmployeeDto>>>
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IMapper _mapper;
 
-        public GetAllEmployeesHandler(IEmployeeRepository employeeRepository)
+        public GetAllEmployeesHandler(IEmployeeRepository employeeRepository, IMapper mapper)
         {
             _employeeRepository = employeeRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<Employee>>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<EmployeeDto>>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
         {
             var employees = await _employeeRepository.GetAllEmployeesAsync();
-            return Result<IEnumerable<Employee>>.Success(employees, "Çalışan listesi başarıyla getirildi.");
+
+            // Veritabanından gelen Entity listesini, DTO listesine dönüştürüyoruz
+            var employeeDtos = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
+
+            return Result<IEnumerable<EmployeeDto>>.Success(employeeDtos, "Çalışan listesi başarıyla getirildi.");
         }
     }
 }

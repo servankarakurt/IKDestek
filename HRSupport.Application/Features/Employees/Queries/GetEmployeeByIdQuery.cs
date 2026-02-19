@@ -1,10 +1,10 @@
 ﻿using HRSupport.Application.Common;
-using HRSupport.Domain.Entites;
+using HRSupport.Application.DTOs;
 using MediatR;
 
 namespace HRSupport.Application.Features.Employees.Queries
 {
-    public class GetEmployeeByIdQuery : IRequest<Result<Employee>>
+    public class GetEmployeeByIdQuery : IRequest<Result<EmployeeDto>>
     {
         public int Id { get; set; }
 

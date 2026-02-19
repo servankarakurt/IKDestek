@@ -13,7 +13,7 @@ namespace HRSupport.Application.Features.Employees.Commans
             RuleFor(x => x.CardID).GreaterThan(0).WithMessage("CardID must be greater than 0");
             RuleFor(x => x.BirthDate).LessThan(DateTime.Now).WithMessage("BirthDate must be in the past");
             RuleFor(x => x.StartDate).LessThanOrEqualTo(DateTime.Now).WithMessage("StartDate cannot be in the future");
-            RuleFor(x => x.Deparment).IsInEnum().WithMessage("Invalid department");
+            RuleFor(x => x.Department).IsInEnum().WithMessage("Invalid department");
             RuleFor(x => x.Roles).IsInEnum().WithMessage("Invalid role");
         }
     }
