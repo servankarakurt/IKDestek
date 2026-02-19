@@ -23,10 +23,19 @@ namespace HRSupport.Infrastructure.Services
         {
             // 1. appsettings.json'dan gizli anahtarımızı ve diğer ayarları okuyoruz
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["Secret"];
-            var issuer = jwtSettings["Issuer"];
-            var audience = jwtSettings["Audience"];
-            var expiryMinutes = Convert.ToInt32(jwtSettings["ExpiryMinutes"]);
+
+            // 2. Değerleri okuyoruz (Eğer appsettings.json'da bulamazsa hata vermemesi için '??' ile fallback ekledik)
+            var secretKey = jwtSettings["Secret"]
+                ?? throw new InvalidOperationException("JWT Secret key is missing in configuration.");
+
+            var issuer = jwtSettings["Issuer"] ?? "HRSupportAPI";
+            var audience = jwtSettings["Audience"] ?? "HRSupportUser";
+
+            // 3. Süre bilgisini okuyoruz (Varsayılan 60 dakika)
+            var expiryMinutesStr = jwtSettings["ExpiryMinutes"];
+            var expiryMinutes = !string.IsNullOrEmpty(expiryMinutesStr)
+                ? Convert.ToInt32(expiryMinutesStr)
+                : 60;
 
             // 2. Gizli anahtarı byte dizisine çeviriyoruz
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

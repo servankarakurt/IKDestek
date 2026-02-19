@@ -37,10 +37,9 @@ namespace HRSupport.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("Createdate");
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("Deparment")
+                    b.Property<int>("Department")
                         .HasColumnType("int")
                         .HasColumnName("Department");
 
@@ -144,8 +143,7 @@ namespace HRSupport.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("Createdate");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()

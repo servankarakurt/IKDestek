@@ -28,7 +28,7 @@
         }
 
         [HttpPost("Create")]
-        [Authorize(Roles = "Admin,HR")] 
+      [Authorize(Roles = "Admin,HR")] 
         public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeCommand command)
         {
             var result = await _mediator.Send(command);

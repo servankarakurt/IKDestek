@@ -29,7 +29,7 @@ builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateEmployeeCommand).Assembly));
 builder.Services.AddAutoMapper(typeof(HRSupport.Application.Mappings.MappingProfile).Assembly);
 
-// 5. JWT Kimlik Doğrulama Ayarları
+//5. JWT Kimlik Doğrulama Ayarları
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["Secret"] ?? "Baziciceklerbazitopraklarayesermezyaninasipteyoksaisrarinluzmuyoktur!";
 
@@ -52,13 +52,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ... diğer builder.Services kodlarınız ...
-
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-// ... diğer builder.Services kodlarınız ...
 
 if (app.Environment.IsDevelopment())
 {
@@ -66,14 +62,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "HRSupport API v1");
-        // İsteğe bağlı: Swagger'ın direkt ana sayfada (localhost:port/) açılmasını isterseniz:
-        // c.RoutePrefix = string.Empty; 
+ 
+        c.RoutePrefix = string.Empty; 
     });
 }
-// 6. Ara Katmanlar (Middlewares)
 app.UseHttpsRedirection();
-
-// DİKKAT: UseAuthentication kesinlikle UseAuthorization'dan önce olmalı!
 app.UseAuthentication();
 app.UseAuthorization();
 

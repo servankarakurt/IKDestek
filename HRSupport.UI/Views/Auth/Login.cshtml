@@ -1,0 +1,44 @@
+﻿@model HRSupport.UI.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Giriş Yap";
+    Layout = null; 
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giriş - IK Destek Sistemi</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100vh;">
+
+    <div class="card shadow-sm" style="width: 400px;">
+        <div class="card-body p-5">
+            <h3 class="text-center mb-4 text-primary">İK Yönetim Sistemi</h3>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger mb-0" })
+                </div>
+            }
+
+            <form asp-action="Login" method="post">
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">Email Adresi</label>
+                    <input asp-for="Email" class="form-control" placeholder="ornek@sirket.com" />
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Password" class="form-label">Şifre</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="******" />
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">Giriş Yap</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
+</html>

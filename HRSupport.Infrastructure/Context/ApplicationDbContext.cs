@@ -1,6 +1,5 @@
 ﻿using HRSupport.Domain.Entites;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace HRSupport.Infrastructure.Context
 {
@@ -10,11 +9,11 @@ namespace HRSupport.Infrastructure.Context
         {
         }
 
-        public DbSet<Employee> Employeess { get; set; }
-        public DbSet<LeaveRequest> LeaveRequests { get; set; } 
+        // DbSet ismindeki "Employeess" yazım hatası düzeltildi
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; }
         public DbSet<Intern> Interns { get; set; }
         public DbSet<User> Users { get; set; }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,19 +22,16 @@ namespace HRSupport.Infrastructure.Context
             // ==========================================
             // 1. EMPLOYEE (ÇALIŞAN) TABLOSU AYARLARI
             // ==========================================
-            modelBuilder.Entity<Employee>().ToTable("Employees"); 
+            modelBuilder.Entity<Employee>().ToTable("Employees");
 
             // EF Core'un bu property'i veritabanında sütun olarak aramamasını sağlıyoruz
             modelBuilder.Entity<Employee>().Ignore(e => e.fullname);
 
-            // İsim uyuşmazlıklarını çözüyoruz
             modelBuilder.Entity<Employee>()
                 .Property(e => e.Department)
                 .HasColumnName("Department");
 
-            modelBuilder.Entity<Employee>()
-                .Property(e => e.CreatedTime)
-                .HasColumnName("Createdate");
+            // HATA VEREN "Createdate" EŞLEŞTİRMESİ KALDIRILDI
 
             // GLOBAL QUERY FILTER: Sadece silinmemiş olan çalışanları getir
             modelBuilder.Entity<Employee>().HasQueryFilter(e => !e.IsDeleted);
@@ -46,15 +42,18 @@ namespace HRSupport.Infrastructure.Context
             // ==========================================
             modelBuilder.Entity<LeaveRequest>().ToTable("LeaveRequests");
 
-            // BaseEntity'den gelen CreatedTime alanını SQL'deki Createdate sütunuyla eşleştiriyoruz
-            modelBuilder.Entity<LeaveRequest>()
-                .Property(e => e.CreatedTime)
-                .HasColumnName("Createdate");
+            // HATA VEREN "Createdate" EŞLEŞTİRMESİ KALDIRILDI
 
-            
+            // GLOBAL QUERY FILTER: Sadece silinmemiş izin taleplerini getir
             modelBuilder.Entity<LeaveRequest>().HasQueryFilter(e => !e.IsDeleted);
 
 
+            // ==========================================
+            // 3. INTERN (STAJYER) VE USER TABLOSU AYARLARI
+            // ==========================================
+            // Stajyerler ve Kullanıcılar için de varsayılan silinmeme filtresi ekleyebilirsiniz
+            modelBuilder.Entity<Intern>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<User>().HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

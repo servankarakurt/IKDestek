@@ -2,5 +2,6 @@
   <Project Path="HRSupport.Application/HRSupport.Application.csproj" />
   <Project Path="HRSupport.Domain/HRSupport.Domain.csproj" />
   <Project Path="HRSupport.Infrastructure/HRSupport.Infrastructure.csproj" />
+  <Project Path="HRSupport.UI/HRSupport.UI.csproj" Id="10302b1d-0381-4211-9d3e-cab1967f8815" />
   <Project Path="HRSupport.WebAPI/HRSupport.WebAPI.csproj" />
 </Solution>

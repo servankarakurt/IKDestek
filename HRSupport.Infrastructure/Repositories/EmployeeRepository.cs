@@ -19,17 +19,17 @@ namespace HRSupport.Infrastructure.Repositories
         public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
         {
             // DbContext içindeki HasQueryFilter sayesinde silinmiş olanlar otomatik elenecek
-            return await _context.Employeess.ToListAsync();
+            return await _context.Employees.ToListAsync();
         }
 
         public async Task<Employee> GetByIdAsync(int id)
         {
-            return await _context.Employeess.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<int> AddAsync(Employee entity)
         {
-            await _context.Employeess.AddAsync(entity);
+            await _context.Employees.AddAsync(entity);
             await _context.SaveChangesAsync();
 
             // EF Core ekleme işleminden sonra Identity(Id) değerini otomatik olarak entity'e atar
@@ -38,7 +38,7 @@ namespace HRSupport.Infrastructure.Repositories
 
         public async Task<Employee> UpdateAsync(Employee employee)
         {
-            _context.Employeess.Update(employee);
+            _context.Employees.Update(employee);
             await _context.SaveChangesAsync();
             return employee;
         }
@@ -46,11 +46,11 @@ namespace HRSupport.Infrastructure.Repositories
         public async Task<Employee> DeleteAsync(int id)
         {
             // Soft delete işlemi
-            var employee = await _context.Employeess.FirstOrDefaultAsync(x => x.Id == id);
+            var employee = await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
             if (employee != null)
             {
                 employee.IsDeleted = true; // Sadece bayrağı güncelliyoruz
-                _context.Employeess.Update(employee);
+                _context.Employees.Update(employee);
                 await _context.SaveChangesAsync();
                 return employee;
             }

@@ -1,0 +1,30 @@
+﻿@model List<HRSupport.UI.Models.EmployeeViewModel>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h2>Çalışan Listesi</h2>
+        <a asp-action="Create" class="btn btn-primary">+ Yeni Çalışan</a>
+    </div>
+    <table class="table table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Ad Soyad</th>
+                <th>Email</th>
+                <th>Departman</th>
+                <th>Başlama Tarihi</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var emp in Model)
+            {
+                <tr>
+                    <td>@emp.FullName</td>
+                    <td>@emp.Email</td>
+                    <td>@emp.Department</td>
+                    <td>@emp.StartDate.ToShortDateString()</td>
+                    <td><button class="btn btn-sm btn-info">Detay</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
