@@ -12,8 +12,6 @@ namespace HRSupport.Domain.Entites
         public int CardID { get; set; }
         public DateTime BirthDate { get; set; }
         public DateTime StartDate { get; set; }
-
-        // 'Deparment' yerine 'Department' olarak düzeltildi
         public Department Department { get; set; }
         public Roles Roles { get; set; }
 

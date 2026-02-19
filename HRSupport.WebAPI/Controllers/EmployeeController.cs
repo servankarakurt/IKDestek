@@ -2,12 +2,15 @@
 {
     using HRSupport.Application.Features.Employees.Commans;
     using HRSupport.Application.Features.Employees.Queries;
+    using HRSupport.Domain.Common;
     using MediatR;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using System.Threading.Tasks;
 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -17,34 +20,31 @@
             _mediator = mediator;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateEmployee(CreateEmployeeCommand command)
-        {
-            var result = await _mediator.Send(command);
-            if (result.IsSuccess)
-            {
-                return Ok(result.Value);
-            }
-            else
-            {
-                return BadRequest(result.Error);
-            }
-        }
-        [HttpGet]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllEmployees()
         {
-            var query = new GetAllEmployeesQuery();
-            var result = await _mediator.Send(query);
-
-            if (result.IsSuccess)
-            {
-                return Ok(result); 
-            }
-            else
-            {
-                return BadRequest(result.Error);
-            }
+            var result = await _mediator.Send(new GetAllEmployeesQuery());
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
+
+        [HttpPost("Create")]
+        [Authorize(Roles = "Admin,HR")] 
+        public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,IK")] 
+        public async Task<IActionResult> DeleteEmployee(int id)
+        {
+            var result = await _mediator.Send(new DeleteEmployeeCommand(id));
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
+    
+        [HttpGet]
+       
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEmployeeById(int id)
         {
@@ -74,21 +74,5 @@
                 return BadRequest(result.Error);
             }
         } 
-     
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
-        {
-            var command = new DeleteEmployeeCommand(id);
-            var result = await _mediator.Send(command);
-
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(result.Error);
-            }
-        }
     }
 }
