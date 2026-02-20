@@ -3,8 +3,8 @@ using HRSupport.Application.Features.Reports.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace HRSupport.WebAPI.Controllers
 {
@@ -14,34 +14,43 @@ namespace HRSupport.WebAPI.Controllers
     public class ReportController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<ReportController> _logger;
 
-        public ReportController(IMediator mediator)
+        public ReportController(IMediator mediator, ILogger<ReportController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
-        // Yöneticilerin (Role 4) rapor talep etmesi için
         [HttpPost("request-report")]
-        [Authorize(Roles = "4,Yönetici")]
+        [Authorize(Roles = "Yönetici")]
         public async Task<IActionResult> RequestReport([FromBody] CreateReportRequestCommand command)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            command.ManagerUserId = userId;
             var result = await _mediator.Send(command);
+
+            _logger.LogInformation("UserId {UserId} report request endpoint sonucu: {IsSuccess}", userId, result.IsSuccess);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 
-        // Personel ve Stajyerlerin (Role 3 ve 5) kendilerinden istenen raporları görmesi için
         [HttpGet("my-requests")]
-        [Authorize(Roles = "3,5,Çalışan,Stajyer")]
+        [Authorize(Roles = "Çalışan")]
         public async Task<IActionResult> GetMyReportRequests()
         {
-            // Token içerisinden login olan kullanıcının ID'sini alıyoruz
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized();
+            }
 
-            if (string.IsNullOrEmpty(userId)) return Unauthorized();
-
-            var query = new GetMyReportRequestsQuery { EmployeeId = int.Parse(userId) };
+            var query = new GetMyReportRequestsQuery { UserId = userId };
             var result = await _mediator.Send(query);
-
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
     }

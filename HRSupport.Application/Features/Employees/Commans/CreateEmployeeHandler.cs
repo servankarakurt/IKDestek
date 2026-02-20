@@ -1,65 +1,57 @@
-﻿using AutoMapper;
-using BCrypt.Net; 
+using AutoMapper;
 using HRSupport.Application.Common;
 using HRSupport.Application.Features.Employees.Commans;
 using HRSupport.Application.Interfaces;
 using HRSupport.Domain.Common;
 using HRSupport.Domain.Entites;
 using MediatR;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace HRSupport.Application.Features.Employees.Commands
 {
     public class CreateEmployeeHandler : IRequestHandler<CreateEmployeeCommand, Result<int>>
     {
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IUserRepository _userRepository; // EKLENDİ: User tablosuna erişim için
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<CreateEmployeeHandler> _logger;
 
         public CreateEmployeeHandler(
             IEmployeeRepository employeeRepository,
             IUserRepository userRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<CreateEmployeeHandler> logger)
         {
             _employeeRepository = employeeRepository;
             _userRepository = userRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<Result<int>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
-            // 1. Personel (Employee) Kaydını Oluştur
             var employee = _mapper.Map<Employee>(request);
             var employeeId = await _employeeRepository.AddAsync(employee);
 
-            // 2. Rastgele 8 Haneli Geçici Şifre Üret
-            string tempPassword = GenerateTemporaryPassword();
+            var tempPassword = GenerateTemporaryPassword();
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
 
-            // 3. Şifreyi Güvenli Hale Getir (Hash'le)
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(tempPassword);
-
-            // 4. Sisteme Giriş Yapabilmesi İçin Yeni User Hesabı Oluştur
             var newUser = new User
             {
-                Email = request.Email, // EmployeeCommand'den gelen email
+                Email = request.Email,
                 PasswordHash = passwordHash,
-                Role =Roles.Çalışan, // Default olarak çalışan rolü veriyoruz
-                IsPasswordChangeRequired = true   // 3. aşamada bu true ise şifre değiştirticez
+                Role = Roles.Çalışan,
+                IsPasswordChangeRequired = true
             };
 
-            // DİKKAT: IUserRepository içine AddAsync metodunu eklemediysen hata verebilir, eklemelisin.
             await _userRepository.AddAsync(newUser);
 
-            // 5. İK Uzmanına geçici şifreyi UI'da gösterebilmek için mesaj olarak dönüyoruz
-            string message = $"Personel başarıyla eklendi. Geçici Şifre: {tempPassword} (Lütfen bu şifreyi personele iletin.)";
+            _logger.LogInformation("Employee created. EmployeeId: {EmployeeId}, Email: {Email}", employeeId, request.Email);
 
+            var message = $"Personel başarıyla eklendi. Geçici Şifre: {tempPassword} (İlk girişte şifre değişikliği zorunludur.)";
             return Result<int>.Success(employeeId, message);
         }
 
-        // Rastgele şifre üreten yardımcı metot
         private string GenerateTemporaryPassword()
         {
             var chars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@$?_-";

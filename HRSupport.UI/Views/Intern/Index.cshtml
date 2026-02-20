@@ -1,5 +1,11 @@
 ﻿@model List<HRSupport.UI.Models.InternViewModel>
 <div class="container mt-4">
+@if (TempData["TempPasswordInfo"] != null)
+{
+    <div class="alert alert-success">@TempData["TempPasswordInfo"]</div>
+}
+
+
     <div class="d-flex justify-content-between mb-3">
         <h2>Stajyer Takip Listesi</h2>
         <a asp-action="Create" class="btn btn-success">+ Yeni Stajyer Kaydı</a>
