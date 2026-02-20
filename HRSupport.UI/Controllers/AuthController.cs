@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -12,11 +13,13 @@ namespace HRSupport.UI.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<AuthController> logger)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -36,7 +39,17 @@ namespace HRSupport.UI.Controllers
             var client = _httpClientFactory.CreateClient();
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Auth/login";
 
-            var response = await client.PostAsJsonAsync(apiUrl, model);
+            HttpResponseMessage response;
+            try
+            {
+                response = await client.PostAsJsonAsync(apiUrl, model);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API bağlantısı başarısız. Login endpoint: {ApiUrl}", apiUrl);
+                ModelState.AddModelError("", "Giriş servisine bağlanılamadı. Lütfen WebAPI uygulamasının çalıştığını kontrol edin.");
+                return View(model);
+            }
 
             if (!response.IsSuccessStatusCode)
             {
@@ -102,11 +115,21 @@ namespace HRSupport.UI.Controllers
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Auth/change-password";
-            var response = await client.PostAsJsonAsync(apiUrl, new
+            HttpResponseMessage response;
+            try
             {
-                CurrentPassword = model.CurrentPassword,
-                NewPassword = model.NewPassword
-            });
+                response = await client.PostAsJsonAsync(apiUrl, new
+                {
+                    CurrentPassword = model.CurrentPassword,
+                    NewPassword = model.NewPassword
+                });
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "API bağlantısı başarısız. ChangePassword endpoint: {ApiUrl}", apiUrl);
+                ModelState.AddModelError("", "Şifre değiştirme servisine bağlanılamadı. Lütfen WebAPI uygulamasını kontrol edin.");
+                return View(model);
+            }
 
             if (response.IsSuccessStatusCode)
             {
