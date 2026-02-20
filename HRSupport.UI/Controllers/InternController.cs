@@ -26,7 +26,7 @@ namespace HRSupport.UI.Controllers
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern";
             var response = await client.GetFromJsonAsync<ApiResponse<List<InternViewModel>>>(apiUrl);
 
-            return View(response?.Data ?? new List<InternViewModel>());
+            return View(response?.Value ?? new List<InternViewModel>());
         }
 
         // YENİ STAJYER EKLE (SAYFA)
@@ -35,6 +35,7 @@ namespace HRSupport.UI.Controllers
 
         // YENİ STAJYER EKLE (İŞLEM)
         [HttpPost]
+        [Authorize(Roles = "Admin,IK")]
         public async Task<IActionResult> Create(CreateInternViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -42,7 +43,7 @@ namespace HRSupport.UI.Controllers
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["JwtToken"]);
 
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern";
+            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern/create";
             var response = await client.PostAsJsonAsync(apiUrl, model);
 
             if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));

@@ -41,7 +41,7 @@ namespace HRSupport.UI.Controllers
                 var result = JsonSerializer.Deserialize<JsonElement>(responseContent);
 
                 // Result sınıfınızın içindeki 'data' propertysinden token'ı çekiyoruz
-                var token = result.GetProperty("data").GetString();
+                var token = result.GetProperty("value").GetString();
 
                 if (!string.IsNullOrEmpty(token))
                 {

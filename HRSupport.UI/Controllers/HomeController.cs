@@ -38,9 +38,9 @@ namespace HRSupport.UI.Controllers
                 // 3. API'ye istek atıyoruz
                 var response = await client.GetFromJsonAsync<ApiResponse<DashboardStatsViewModel>>(apiUrl);
 
-                if (response != null && response.IsSuccess)
+                if (response != null )
                 {
-                    return View(response.Data); // Veriyi View'a gönderiyoruz
+                    return View(response); // Veriyi View'a gönderiyoruz
                 }
             }
             catch (Exception ex)

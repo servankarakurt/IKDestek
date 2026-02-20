@@ -1,0 +1,58 @@
+﻿@model HRSupport.UI.Models.CreateLeaveRequestViewModel
+
+@{
+    ViewData["Title"] = "İzin Talebi Oluştur";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-warning bg-gradient text-dark p-4">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-calendar2-range me-2"></i>Yeni İzin Talebi</h4>
+                </div>
+                <div class="card-body p-5 bg-light">
+
+                    <form asp-action="Create" method="post">
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="StartDate" type="date" class="form-control rounded-3" required />
+                                    <label asp-for="StartDate">Başlangıç Tarihi</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="EndDate" type="date" class="form-control rounded-3" required />
+                                    <label asp-for="EndDate">Bitiş Tarihi</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <select asp-for="Type" class="form-select rounded-3" required>
+                                <option value="">İzin Türünü Seçiniz...</option>
+                                <option value="1">Yıllık İzin</option>
+                                <option value="2">Mazeret İzni</option>
+                                <option value="3">Hastalık / Rapor</option>
+                                <option value="4">Ücretsiz İzin</option>
+                            </select>
+                            <label asp-for="Type">İzin Türü</label>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <textarea asp-for="Description" class="form-control rounded-3" placeholder="Açıklama" style="height: 120px" required></textarea>
+                            <label asp-for="Description">Açıklama (Neden izne ayrılıyorsunuz?)</label>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <a asp-action="Index" class="btn btn-light border-secondary px-4 py-2 rounded-3 shadow-sm fw-bold">İptal</a>
+                            <button type="submit" class="btn btn-warning px-5 py-2 rounded-3 shadow fw-bold"><i class="bi bi-send me-2"></i>Talebi Gönder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,94 @@
+﻿@model HRSupport.UI.Models.CreateInternViewModel
+
+@{
+    ViewData["Title"] = "Yeni Stajyer Ekle";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-success bg-gradient text-white p-4">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-mortarboard me-2"></i>Yeni Stajyer Kaydı</h4>
+                </div>
+                <div class="card-body p-5 bg-light">
+
+                    <form asp-action="Create" method="post">
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="FirstName" class="form-control rounded-3" placeholder="Ad" required />
+                                    <label asp-for="FirstName">Ad</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="LastName" class="form-control rounded-3" placeholder="Soyad" required />
+                                    <label asp-for="LastName">Soyad</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Email" type="email" class="form-control rounded-3" placeholder="E-Posta" required />
+                                    <label asp-for="Email">E-Posta Adresi</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Phone" type="tel" class="form-control rounded-3" placeholder="Telefon" />
+                                    <label asp-for="Phone">Telefon</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="text-success fw-bold mb-3 border-bottom pb-2">Eğitim & Staj Bilgileri</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-5">
+                                <div class="form-floating">
+                                    <input asp-for="University" class="form-control rounded-3" placeholder="Üniversite" />
+                                    <label asp-for="University">Üniversite</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input asp-for="Major" class="form-control rounded-3" placeholder="Bölüm" />
+                                    <label asp-for="Major">Bölüm</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input asp-for="Grade" type="number" class="form-control rounded-3" placeholder="Sınıf" min="1" max="4" />
+                                    <label asp-for="Grade">Sınıf</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input asp-for="StartDate" type="date" class="form-control rounded-3" required />
+                                    <label asp-for="StartDate">Staj Başlangıç</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input asp-for="EndDate" type="date" class="form-control rounded-3" required />
+                                    <label asp-for="EndDate">Staj Bitiş</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input asp-for="MentorId" type="number" class="form-control rounded-3" placeholder="Mentor ID" />
+                                    <label asp-for="MentorId">Mentor ID (Opsiyonel)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <a asp-action="Index" class="btn btn-light border-secondary px-4 py-2 rounded-3 shadow-sm fw-bold">İptal</a>
+                            <button type="submit" class="btn btn-success px-5 py-2 rounded-3 shadow fw-bold"><i class="bi bi-save me-2"></i>Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

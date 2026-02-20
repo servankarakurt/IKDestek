@@ -23,10 +23,10 @@ namespace HRSupport.UI.Controllers
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["JwtToken"]);
 
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Employee";
+            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/GetAllEmployees";
             var response = await client.GetFromJsonAsync<ApiResponse<List<EmployeeViewModel>>>(apiUrl);
 
-            return View(response?.Data ?? new List<EmployeeViewModel>());
+            return View(response?.Value ?? new List<EmployeeViewModel>());
         }
 
         // 2. EKLEME (SAYFA)
@@ -42,7 +42,7 @@ namespace HRSupport.UI.Controllers
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["JwtToken"]);
 
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Employee";
+            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Employee/create";
             var response = await client.PostAsJsonAsync(apiUrl, model);
 
             if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));

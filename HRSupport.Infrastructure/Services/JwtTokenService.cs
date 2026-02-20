@@ -25,7 +25,7 @@ namespace HRSupport.Infrastructure.Services
             var jwtSettings = _configuration.GetSection("JwtSettings");
 
             // 2. Değerleri okuyoruz (Eğer appsettings.json'da bulamazsa hata vermemesi için '??' ile fallback ekledik)
-            var secretKey = jwtSettings["Secret"]
+            var secretKey = jwtSettings["SecretKey"]
                 ?? throw new InvalidOperationException("JWT Secret key is missing in configuration.");
 
             var issuer = jwtSettings["Issuer"] ?? "HRSupportAPI";
