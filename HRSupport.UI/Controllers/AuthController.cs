@@ -1,9 +1,10 @@
 ﻿using HRSupport.UI.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt; 
-using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
-using System.Linq; 
+using System.Security.Claims;
 
 namespace HRSupport.UI.Controllers
 {
@@ -19,7 +20,13 @@ namespace HRSupport.UI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login() => View();
+        public IActionResult Login() => View(new LoginViewModel());
+
+        [HttpGet("Auth/PersonelGiris")]
+        public IActionResult PersonelGiris() => View("Login", new LoginViewModel());
+
+        [HttpGet("Auth/StajyerGiris")]
+        public IActionResult StajyerGiris() => View("Login", new LoginViewModel());
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -31,39 +38,49 @@ namespace HRSupport.UI.Controllers
 
             var response = await client.PostAsJsonAsync(apiUrl, model);
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadFromJsonAsync<ApiResponse<LoginResponseModel>>();
-                var token = result?.Value?.Token;
-
-                if (!string.IsNullOrEmpty(token))
-                {
-                    // Token'ı Cookie'ye kaydet
-                    Response.Cookies.Append("JwtToken", token, new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict,
-                        Expires = DateTime.UtcNow.AddHours(1)
-                    });
-
-                    // --- Şifre Değiştirme Kontrolü ---
-                    var handler = new JwtSecurityTokenHandler();
-                    var jwtToken = handler.ReadJwtToken(token);
-                    var changeRequired = jwtToken.Claims.FirstOrDefault(c => c.Type == "IsPasswordChangeRequired")?.Value;
-
-                    if (changeRequired == "True")
-                    {
-                        TempData["Message"] = "İlk girişiniz olduğu için şifrenizi değiştirmeniz gerekmektedir.";
-                        return RedirectToAction("ChangePassword");
-                    }
-
-                    return RedirectToAction("Index", "Home");
-                }
+                ModelState.AddModelError("", "E-posta veya şifre hatalı.");
+                return View(model);
             }
 
-            ModelState.AddModelError("", "E-posta veya şifre hatalı.");
-            return View(model);
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<LoginResponseModel>>();
+            var token = result?.Value?.Token;
+
+            if (string.IsNullOrEmpty(token))
+            {
+                ModelState.AddModelError("", "Giriş sırasında token üretilemedi.");
+                return View(model);
+            }
+
+            Response.Cookies.Append("JwtToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddHours(1)
+            });
+
+            var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            var claims = jwtToken.Claims.ToList();
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync("HRSupportCookie", principal, new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+            });
+
+            var changeRequired = jwtToken.Claims.FirstOrDefault(c => c.Type == "IsPasswordChangeRequired")?.Value;
+            if (string.Equals(changeRequired, "True", StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Message"] = "İlk girişiniz olduğu için şifrenizi değiştirmeniz gerekmektedir.";
+                return RedirectToAction("ChangePassword");
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -85,8 +102,6 @@ namespace HRSupport.UI.Controllers
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Auth/change-password";
-
-            // API'ye sadece mevcut ve yeni şifreyi gönderiyoruz (ID'yi API token'dan alacak)
             var response = await client.PostAsJsonAsync(apiUrl, new
             {
                 CurrentPassword = model.CurrentPassword,
@@ -96,8 +111,7 @@ namespace HRSupport.UI.Controllers
             if (response.IsSuccessStatusCode)
             {
                 TempData["SuccessMessage"] = "Şifreniz başarıyla güncellendi. Lütfen yeni şifrenizle tekrar giriş yapın.";
-
-                // Şifre değişince eski token geçersiz olacağı için logout yapıp login'e atıyoruz
+                await HttpContext.SignOutAsync("HRSupportCookie");
                 Response.Cookies.Delete("JwtToken");
                 return RedirectToAction("Login");
             }
@@ -107,8 +121,9 @@ namespace HRSupport.UI.Controllers
             return View(model);
         }
 
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
+            await HttpContext.SignOutAsync("HRSupportCookie");
             Response.Cookies.Delete("JwtToken");
             return RedirectToAction("Login");
         }

@@ -1,31 +1,99 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+:root {
+  --brand-primary: #1f3c88;
+  --brand-secondary: #3b82f6;
+  --surface: #f4f7fc;
+  --card-bg: #ffffff;
+  --text-main: #1f2937;
 }
 
 html {
+  font-size: 15px;
   position: relative;
   min-height: 100%;
 }
 
+@media (min-width: 768px) {
+  html { font-size: 16px; }
+}
+
 body {
-  margin-bottom: 60px;
+  color: var(--text-main);
+  background: linear-gradient(180deg, #f8fbff 0%, var(--surface) 100%);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.corporate-navbar {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.corporate-navbar .nav-link {
+  color: #e5edff;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 8px 12px !important;
+}
+
+.corporate-navbar .nav-link:hover,
+.corporate-navbar .nav-link:focus {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.corporate-footer {
+  border-top: 1px solid #dbe4f0;
+  color: #6b7280;
+  font-size: .9rem;
+  background-color: #fff;
+}
+
+.page-shell {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(31, 60, 136, .08);
+}
+
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #223a70 !important;
+  color: #fff !important;
+  border: 0;
+}
+
+.btn-primary {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.btn-primary:hover {
+  background-color: #1b3375;
+  border-color: #1b3375;
+}
+
+.auth-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, #dbeafe, #f8fafc 55%);
+}
+
+.auth-card {
+  width: 420px;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(31, 60, 136, .15);
+}
+
+.auth-brand {
+  color: var(--brand-primary);
+  font-weight: 700;
+}
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow: 0 0 0 .12rem #fff, 0 0 0 .25rem rgba(59, 130, 246, .45);
 }

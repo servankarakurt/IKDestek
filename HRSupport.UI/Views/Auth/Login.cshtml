@@ -1,7 +1,7 @@
 ﻿@model HRSupport.UI.Models.LoginViewModel
 @{
     ViewData["Title"] = "Giriş Yap";
-    Layout = null; 
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -11,12 +11,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Giriş - IK Destek Sistemi</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100vh;">
+<body class="auth-page d-flex align-items-center justify-content-center">
 
-    <div class="card shadow-sm" style="width: 400px;">
+    <div class="card auth-card">
         <div class="card-body p-5">
-            <h3 class="text-center mb-4 text-primary">İK Yönetim Sistemi</h3>
+            <h3 class="text-center mb-4 auth-brand">İK Yönetim Sistemi</h3>
+            <p class="text-center text-muted mb-4">Personel / Stajyer giriş ekranı</p>
 
             @if (!ViewData.ModelState.IsValid)
             {
@@ -40,5 +42,4 @@
     </div>
 
 </body>
-</html>
 </html>

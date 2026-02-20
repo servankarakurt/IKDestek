@@ -1,4 +1,4 @@
-using HRSupport.Application.Features.Employees.Commans;
+﻿using HRSupport.Application.Features.Employees.Commans;
 using HRSupport.Application.Interfaces;
 using HRSupport.Infrastructure.Context;
 using HRSupport.Infrastructure.Repositories;
@@ -30,15 +30,22 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInternRepository, InternRepository>();
+builder.Services.AddScoped<IWeeklyReportRepository, WeeklyReportRepository>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
 // 4. MediatR ve AutoMapper
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateEmployeeCommand).Assembly));
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(CreateEmployeeCommand).Assembly);
+    cfg.AddOpenBehavior(typeof(HRSupport.Application.Common.LoggingBehavior<,>));
+});
 builder.Services.AddAutoMapper(typeof(HRSupport.Application.Mappings.MappingProfile).Assembly);
 
 //5. JWT Kimlik Doğrulama Ayarları
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["Secret"] ?? "Baziciceklerbazitopraklarayesermezyaninasipteyoksaisrarinluzmuyoktur!";
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddAuthentication(options =>
 {
