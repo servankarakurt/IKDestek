@@ -1,4 +1,4 @@
-﻿using HRSupport.UI.Models;
+using HRSupport.UI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
@@ -10,23 +10,43 @@ namespace HRSupport.UI.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<LeaveRequestController> _logger;
 
-        public LeaveRequestController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public LeaveRequestController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<LeaveRequestController> logger)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _logger = logger;
         }
 
         // 1. TÜM İZİN TALEPLERİNİ LİSTELE
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["JwtToken"]);
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                
+                if (!Request.Cookies.TryGetValue("JwtToken", out var token) || string.IsNullOrEmpty(token))
+                {
+                    _logger.LogWarning("JWT Token bulunamadı. Giriş sayfasına yönlendir.");
+                    return RedirectToAction("Login", "Auth");
+                }
 
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest";
-            var response = await client.GetFromJsonAsync<ApiResponse<List<LeaveRequestViewModel>>>(apiUrl);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            return View(response?.Value ?? new List<LeaveRequestViewModel>());
+                var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/GetAll";
+                _logger.LogInformation($"API çağrısı: {apiUrl}");
+                
+                var response = await client.GetFromJsonAsync<ApiResponse<List<LeaveRequestViewModel>>>(apiUrl);
+
+                return View(response?.Value ?? new List<LeaveRequestViewModel>());
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError($"API hatası: {ex.Message}");
+                ModelState.AddModelError("", "İzin talepleri yüklenirken bir hata oluştu.");
+                return View(new List<LeaveRequestViewModel>());
+            }
         }
 
         // 2. YENİ İZİN TALEBİ OLUŞTUR (SAYFA)
@@ -43,15 +63,30 @@ namespace HRSupport.UI.Controllers
                 return View(model);
             }
 
-            var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["JwtToken"]);
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                
+                if (!Request.Cookies.TryGetValue("JwtToken", out var token) || string.IsNullOrEmpty(token))
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
 
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/create";
-            var response = await client.PostAsJsonAsync(apiUrl, model);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
+                var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/Create";
+                var response = await client.PostAsJsonAsync(apiUrl, model);
 
-            ModelState.AddModelError("", "İzin talebi gönderilirken bir hata oluştu.");
+                if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
+
+                ModelState.AddModelError("", "İzin talebi gönderilirken bir hata oluştu.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"İzin talebi oluşturma hatası: {ex.Message}");
+                ModelState.AddModelError("", "Bir hata oluştu. Lütfen tekrar deneyin.");
+            }
+
             return View(model);
         }
     }

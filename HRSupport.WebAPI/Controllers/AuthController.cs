@@ -2,6 +2,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace HRSupport.WebAPI.Controllers
 {
@@ -29,6 +31,26 @@ namespace HRSupport.WebAPI.Controllers
             var result = await _mediator.Send(command);
             // Başarısız ise 401 Unauthorized dönüyoruz
             return result.IsSuccess ? Ok(result) : Unauthorized(result);
+        }
+
+        [HttpPost("change-password")]
+        [Authorize] // Şifre değiştirmek için sisteme geçici token ile girmiş olması gerek
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
+        {
+            // Token'dan giriş yapan kişinin ID'sini alıyoruz (Güvenlik için)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                command.UserId = userId; // ID'yi DTO'ya basıyoruz
+                var result = await _mediator.Send(command);
+                if (result.IsSuccess)
+                    return Ok(result);
+
+                return BadRequest(result);
+            }
+
+            return Unauthorized();
         }
     }
 }

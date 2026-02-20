@@ -1,16 +1,15 @@
-﻿namespace HRSupport.WebAPI.Controllers
-{
-    using HRSupport.Application.Features.Employees.Commans;
-    using HRSupport.Application.Features.Employees.Queries;
-    using HRSupport.Domain.Common;
-    using MediatR;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using System.Threading.Tasks;
+﻿using HRSupport.Application.Features.Employees.Commans;
+using HRSupport.Application.Features.Employees.Queries;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
-    [ApiController]
+namespace HRSupport.WebAPI.Controllers
+{
     [Route("api/[controller]")]
-    [Authorize]
+    [ApiController]
+    [Authorize] // Sınıf seviyesinde sisteme login olmak zorunlu
     public class EmployeeController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -20,59 +19,45 @@
             _mediator = mediator;
         }
 
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAllEmployees()
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
             var result = await _mediator.Send(new GetAllEmployeesQuery());
-            return result.IsSuccess ? Ok(result) : BadRequest(result);
+            return Ok(result);
         }
 
-        [HttpPost("Create")]
-      [Authorize(Roles = "Admin,HR")] 
-        public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeCommand command)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _mediator.Send(new GetEmployeeByIdQuery(id));
+            return Ok(result);
+        }
+
+        // DİKKAT: Sadece Admin(1) ve İK(2) yeni personel ekleyebilir.
+        [HttpPost("create")]
+        [Authorize(Roles = "1, 2")]
+        public async Task<IActionResult> Create([FromBody] CreateEmployeeCommand command)
         {
             var result = await _mediator.Send(command);
-            return result.IsSuccess ? Ok(result) : BadRequest(result);
+            return Ok(result);
         }
 
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,IK")] 
-        public async Task<IActionResult> DeleteEmployee(int id)
+        // DİKKAT: Güncelleme işlemi de genelde İK ve Admin'dedir.
+        [HttpPut("update")]
+        [Authorize(Roles = "1, 2")]
+        public async Task<IActionResult> Update([FromBody] UpdateEmployeeCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        // DİKKAT: Silme yetkisi sadece İK ve Admin'de.
+        [HttpDelete("delete/{id}")]
+        [Authorize(Roles = "1, 2")]
+        public async Task<IActionResult> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteEmployeeCommand(id));
-            return result.IsSuccess ? Ok(result) : BadRequest(result);
+            return Ok(result);
         }
-    
-        [HttpGet]
-       
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetEmployeeById(int id)
-        {
-            var query = new GetEmployeeByIdQuery(id);
-            var result = await _mediator.Send(query);
-
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            else
-            {             
-                return NotFound(result.Error);
-            }
-        }
-        [HttpPut]
-        public async Task<IActionResult> UpdateEmployee(UpdateEmployeeCommand command)
-        {
-            var result = await _mediator.Send(command);
-
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(result.Error);
-            }
-        } 
     }
 }

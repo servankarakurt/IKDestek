@@ -36,11 +36,10 @@ namespace HRSupport.UI.Controllers
             try
             {
                 // 3. API'ye istek atıyoruz
-                var response = await client.GetFromJsonAsync<ApiResponse<DashboardStatsViewModel>>(apiUrl);
-
-                if (response != null )
+                var response = await client.GetFromJsonAsync<DashboardStatsViewModel>(apiUrl);
+                if (response != null)
                 {
-                    return View(response); // Veriyi View'a gönderiyoruz
+                    return View(response); 
                 }
             }
             catch (Exception ex)

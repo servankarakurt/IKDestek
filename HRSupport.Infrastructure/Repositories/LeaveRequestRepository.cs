@@ -48,5 +48,11 @@ namespace HRSupport.Infrastructure.Repositories
                 .Where(x => x.Status == LeaveStatus.Beklemede)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<LeaveRequest>> GetByEmployeeIdAsync(int employeeId)
+        {
+            return await _context.LeaveRequests
+                .Where(x => x.EmployeeId == employeeId)
+                .ToListAsync();
+        }
     }
 }

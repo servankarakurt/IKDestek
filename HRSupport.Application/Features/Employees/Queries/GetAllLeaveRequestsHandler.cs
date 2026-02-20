@@ -2,6 +2,7 @@
 using HRSupport.Application.Common;
 using HRSupport.Application.DTOs;
 using HRSupport.Application.Interfaces;
+using HRSupport.Domain.Entites;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading;
@@ -22,13 +23,35 @@ namespace HRSupport.Application.Features.Employees.Queries
 
         public async Task<Result<IEnumerable<LeaveRequestDto>>> Handle(GetAllLeaveRequestsQuery request, CancellationToken cancellationToken)
         {
-            // Veritabanındaki tüm izin taleplerini çekiyoruz
-            var leaveRequests = await _leaveRepository.GetAllAsync();
+            IEnumerable<LeaveRequest> leaveRequests;
 
-            // Gelen Entity listesini AutoMapper ile DTO listesine dönüştürüyoruz
+            // Yetkilendirme Kontrolü: 
+            // Rol 2 (IKAdmin) veya 4 (Yönetici) ise sadece kendi verilerini görsün.
+            // Diğer roller (Admin=1, Çalışan=3, Stajyer=5) tüm listeyi görebilir.
+            if (request.Role == "2" || request.Role == "Çalışan" || request.Role == "4" || request.Role == "Stajyer")
+            {
+                // UI veya API katmanından gelen UserId string'ini int EmployeeId'ye çeviriyoruz.
+                if (int.TryParse(request.UserId, out int employeeId))
+                {
+                    // Repository'e yeni eklediğimiz GetByEmployeeIdAsync metodunu kullanıyoruz.
+                    leaveRequests = await _leaveRepository.GetByEmployeeIdAsync(employeeId);
+                }
+                else
+                {
+                    // Geçersiz ID durumunda boş liste dönerek güvenliği sağlıyoruz.
+                    leaveRequests = new List<LeaveRequest>();
+                }
+            }
+            else
+            {
+                // Üst roller tüm izin taleplerini çekiyor.
+                leaveRequests = await _leaveRepository.GetAllAsync();
+            }
+
+            // Entity listesini UI'a gönderilecek DTO listesine eşliyoruz.
             var leaveRequestDtos = _mapper.Map<IEnumerable<LeaveRequestDto>>(leaveRequests);
 
-            return Result<IEnumerable<LeaveRequestDto>>.Success(leaveRequestDtos, "Tüm izin talepleri başarıyla getirildi.");
+            return Result<IEnumerable<LeaveRequestDto>>.Success(leaveRequestDtos, "İzin talepleri yetki dahilinde başarıyla getirildi.");
         }
     }
 }

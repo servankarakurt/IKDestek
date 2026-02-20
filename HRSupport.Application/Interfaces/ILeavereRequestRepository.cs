@@ -10,5 +10,7 @@ namespace HRSupport.Application.Interfaces
         Task<int> AddAsync(LeaveRequest leaveRequest);
         Task UpdateAsync(LeaveRequest leaveRequest); // Durum güncellemesi için eklendi
         Task<IEnumerable<LeaveRequest>> GetPendingRequestsAsync();
+        Task<IEnumerable<LeaveRequest>> GetByEmployeeIdAsync(int employeeId);
+
     }
 }

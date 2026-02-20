@@ -46,8 +46,10 @@ namespace HRSupport.Infrastructure.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                // Kullanıcının rolünü (Admin, HR, Employee) token'a ekliyoruz ki yetkilendirme yapabilelim
+                new Claim("IsPasswordChangeRequired", user.IsPasswordChangeRequired.ToString()),
+                // Kullanıcının rolünü (Admin,IK, Employee) token'a ekliyoruz ki yetkilendirme yapabilelim
                 new Claim(ClaimTypes.Role, user.Role.ToString())
+
             };
 
             // 4. Token ayarlarını birleştirip oluşturuyoruz

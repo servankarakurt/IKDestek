@@ -7,5 +7,7 @@ namespace HRSupport.Application.Interfaces
     {
         Task<User?> GetByEmailAsync(string email);
         Task<int> AddAsync(User user);
+        Task<User?> GetByIdAsync(int id);
+        Task UpdateAsync(User user);
     }
 }

@@ -1,7 +1,12 @@
-﻿using HRSupport.UI.Models;
+using HRSupport.UI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace HRSupport.UI.Controllers
 {
@@ -17,7 +22,6 @@ namespace HRSupport.UI.Controllers
             _configuration = configuration;
         }
 
-        // STAJYER LİSTESİ
         public async Task<IActionResult> Index()
         {
             var client = _httpClientFactory.CreateClient();
@@ -29,16 +33,23 @@ namespace HRSupport.UI.Controllers
             return View(response?.Value ?? new List<InternViewModel>());
         }
 
-        // YENİ STAJYER EKLE (SAYFA)
+        // Sadece yetkili kişiler Stajyer Ekleme sayfasını görebilir
         [HttpGet]
-        public IActionResult Create() => View();
+        [Authorize(Roles = "1, 2")]
+        public IActionResult Create()
+        {
+            return View();
+        }
 
-        // YENİ STAJYER EKLE (İŞLEM)
+        // Sadece yetkili kişiler formu POST edebilir
         [HttpPost]
-        [Authorize(Roles = "Admin,IK")]
+        [Authorize(Roles = "1, 2")]
         public async Task<IActionResult> Create(CreateInternViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
 
             var client = _httpClientFactory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["JwtToken"]);
@@ -46,9 +57,12 @@ namespace HRSupport.UI.Controllers
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern/create";
             var response = await client.PostAsJsonAsync(apiUrl, model);
 
-            if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction(nameof(Index));
+            }
 
-            ModelState.AddModelError("", "Stajyer kaydı sırasında bir hata oluştu.");
+            ModelState.AddModelError("", "Stajyer eklenirken bir hata oluştu.");
             return View(model);
         }
     }

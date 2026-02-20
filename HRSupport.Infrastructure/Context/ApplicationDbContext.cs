@@ -14,6 +14,7 @@ namespace HRSupport.Infrastructure.Context
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
         public DbSet<Intern> Interns { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<WeeklyReportRequest> WeeklyReportRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
