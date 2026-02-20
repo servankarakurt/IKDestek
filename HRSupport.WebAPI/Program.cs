@@ -40,6 +40,8 @@ builder.Services.AddAutoMapper(typeof(HRSupport.Application.Mappings.MappingProf
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["Secret"] ?? "Baziciceklerbazitopraklarayesermezyaninasipteyoksaisrarinluzmuyoktur!";
 
+builder.Services.AddAuthorization();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
