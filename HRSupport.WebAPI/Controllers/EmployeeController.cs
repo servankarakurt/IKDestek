@@ -3,20 +3,22 @@ using HRSupport.Application.Features.Employees.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace HRSupport.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Sınıf seviyesinde sisteme login olmak zorunlu
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<EmployeeController> _logger;
 
-        public EmployeeController(IMediator mediator)
+        public EmployeeController(IMediator mediator, ILogger<EmployeeController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -33,27 +35,25 @@ namespace HRSupport.WebAPI.Controllers
             return Ok(result);
         }
 
-        // DİKKAT: Sadece Admin(1) ve İK(2) yeni personel ekleyebilir.
         [HttpPost("create")]
-        [Authorize(Roles = "1, 2")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateEmployeeCommand command)
         {
             var result = await _mediator.Send(command);
+            _logger.LogInformation("Employee create endpoint, email: {Email}, success: {IsSuccess}", command.Email, result.IsSuccess);
             return Ok(result);
         }
 
-        // DİKKAT: Güncelleme işlemi de genelde İK ve Admin'dedir.
         [HttpPut("update")]
-        [Authorize(Roles = "1, 2")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update([FromBody] UpdateEmployeeCommand command)
         {
             var result = await _mediator.Send(command);
             return Ok(result);
         }
 
-        // DİKKAT: Silme yetkisi sadece İK ve Admin'de.
         [HttpDelete("delete/{id}")]
-        [Authorize(Roles = "1, 2")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteEmployeeCommand(id));
