@@ -1,9 +1,10 @@
-﻿using HRSupport.Domain.Entites;
+﻿using HRSupport.Application.Interfaces;
+using HRSupport.Domain.Entites;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRSupport.Infrastructure.Context
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

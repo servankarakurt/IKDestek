@@ -1,11 +1,9 @@
-﻿using HRSupport.Application.Features.Employees.Commands;
-using HRSupport.Application.Features.Employees.Queries;
-using HRSupport.Application.Features.Interns.Commands;
+﻿using HRSupport.Application.Features.Interns.Commands;
 using HRSupport.Application.Features.Interns.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace HRSupport.WebAPI.Controllers
 {
@@ -15,10 +13,12 @@ namespace HRSupport.WebAPI.Controllers
     public class InternController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<InternController> _logger;
 
-        public InternController(IMediator mediator)
+        public InternController(IMediator mediator, ILogger<InternController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -28,12 +28,12 @@ namespace HRSupport.WebAPI.Controllers
             return Ok(result);
         }
 
-        // DİKKAT: Sadece Admin(1) ve İK(2) stajyer ekleyebilir.
         [HttpPost("create")]
-        [Authorize(Roles = "1, 2")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateInternCommand command)
         {
             var result = await _mediator.Send(command);
+            _logger.LogInformation("Intern create endpoint, email: {Email}, success: {IsSuccess}", command.Email, result.IsSuccess);
             return Ok(result);
         }
     }

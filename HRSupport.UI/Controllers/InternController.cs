@@ -1,12 +1,7 @@
 using HRSupport.UI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 namespace HRSupport.UI.Controllers
 {
@@ -33,17 +28,15 @@ namespace HRSupport.UI.Controllers
             return View(response?.Value ?? new List<InternViewModel>());
         }
 
-        // Sadece yetkili kişiler Stajyer Ekleme sayfasını görebilir
         [HttpGet]
-        [Authorize(Roles = "1, 2")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // Sadece yetkili kişiler formu POST edebilir
         [HttpPost]
-        [Authorize(Roles = "1, 2")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(CreateInternViewModel model)
         {
             if (!ModelState.IsValid)
@@ -59,6 +52,8 @@ namespace HRSupport.UI.Controllers
 
             if (response.IsSuccessStatusCode)
             {
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<int>>();
+                TempData["TempPasswordInfo"] = result?.Message;
                 return RedirectToAction(nameof(Index));
             }
 

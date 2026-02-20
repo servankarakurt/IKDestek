@@ -1,9 +1,8 @@
 ﻿using HRSupport.Application.Interfaces;
+using HRSupport.Domain.Common;
 using HRSupport.Domain.Entites;
 using HRSupport.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace HRSupport.Infrastructure.Repositories
 {
@@ -18,21 +17,30 @@ namespace HRSupport.Infrastructure.Repositories
 
         public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
         {
-            // DbContext içindeki HasQueryFilter sayesinde silinmiş olanlar otomatik elenecek
             return await _context.Employees.ToListAsync();
         }
 
-        public async Task<Employee> GetByIdAsync(int id)
+        public async Task<Employee?> GetByIdAsync(int id)
         {
             return await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<Employee?> GetByEmailAsync(string email)
+        {
+            return await _context.Employees.FirstOrDefaultAsync(x => x.Email == email);
+        }
+
+        public async Task<IEnumerable<Employee>> GetByDepartmentAsync(Department department)
+        {
+            return await _context.Employees
+                .Where(x => x.Department == department)
+                .ToListAsync();
         }
 
         public async Task<int> AddAsync(Employee entity)
         {
             await _context.Employees.AddAsync(entity);
             await _context.SaveChangesAsync();
-
-            // EF Core ekleme işleminden sonra Identity(Id) değerini otomatik olarak entity'e atar
             return entity.Id;
         }
 
@@ -43,17 +51,17 @@ namespace HRSupport.Infrastructure.Repositories
             return employee;
         }
 
-        public async Task<Employee> DeleteAsync(int id)
+        public async Task<Employee?> DeleteAsync(int id)
         {
-            // Soft delete işlemi
             var employee = await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
             if (employee != null)
             {
-                employee.IsDeleted = true; // Sadece bayrağı güncelliyoruz
+                employee.IsDeleted = true;
                 _context.Employees.Update(employee);
                 await _context.SaveChangesAsync();
                 return employee;
             }
+
             return null;
         }
     }

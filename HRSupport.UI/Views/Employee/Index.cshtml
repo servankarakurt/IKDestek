@@ -1,6 +1,12 @@
-@model List<HRSupport.UI.Models.EmployeeViewModel>
+﻿@model List<HRSupport.UI.Models.EmployeeViewModel>
 
-<div class="container mt-4">
+<div class="page-shell">
+@if (TempData["TempPasswordInfo"] != null)
+{
+    <div class="alert alert-success">@TempData["TempPasswordInfo"]</div>
+}
+
+
     <div class="d-flex justify-content-between mb-3">
         <h2>Çalışan Listesi</h2>
         <a asp-action="Create" asp-controller="Employee" class="btn btn-primary">+ Yeni Çalışan</a>

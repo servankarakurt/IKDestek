@@ -7,6 +7,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 
 // 2. MVC tarafında kullanıcının giriş yaptığını hatırlamak için Cookie Authentication
+builder.Services.AddAuthorization();
+
 builder.Services.AddAuthentication("HRSupportCookie")
     .AddCookie("HRSupportCookie", options =>
     {
