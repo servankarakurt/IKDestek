@@ -1,4 +1,7 @@
 ﻿@model List<HRSupport.UI.Models.InternViewModel>
+@{
+    var interns = Model ?? new List<HRSupport.UI.Models.InternViewModel>();
+}
 <div class="page-shell">
 @if (TempData["TempPasswordInfo"] != null)
 {
@@ -10,8 +13,10 @@
         <h2>Stajyer Takip Listesi</h2>
         <a asp-action="Create" class="btn btn-success">+ Yeni Stajyer Kaydı</a>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover shadow-sm border">
+    @if (interns.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-hover shadow-sm border">
             <thead class="table-primary">
                 <tr>
                     <th>Ad Soyad</th>
@@ -22,7 +27,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var intern in Model)
+                @foreach (var intern in interns)
                 {
                     <tr>
                         <td><strong>@intern.FullName</strong><br /><small>@intern.Email</small></td>
@@ -33,6 +38,11 @@
                     </tr>
                 }
             </tbody>
-        </table>
-    </div>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">Henüz hiç stajyer bulunmamaktadır.</div>
+    }
 </div>

@@ -1,4 +1,7 @@
 ﻿@model List<HRSupport.UI.Models.EmployeeViewModel>
+@{
+    var employees = Model ?? new List<HRSupport.UI.Models.EmployeeViewModel>();
+}
 
 <div class="page-shell">
 @if (TempData["TempPasswordInfo"] != null)
@@ -12,7 +15,7 @@
         <a asp-action="Create" asp-controller="Employee" class="btn btn-primary">+ Yeni Çalışan</a>
     </div>
 
-    @if (Model?.Count > 0)
+    @if (employees.Count > 0)
     {
         <table class="table table-hover shadow-sm">
             <thead class="table-dark">
@@ -25,7 +28,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var emp in Model)
+                @foreach (var emp in employees)
                 {
                     <tr>
                         <td>@emp.FullName</td>
