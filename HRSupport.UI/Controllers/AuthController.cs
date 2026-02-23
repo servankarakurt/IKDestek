@@ -37,20 +37,27 @@ namespace HRSupport.UI.Controllers
             var client = _httpClientFactory.CreateClient();
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Auth/login";
 
-            var response = await client.PostAsJsonAsync(apiUrl, model);
-
-           
-            var result = await response.Content.ReadFromJsonAsync<ApiResult<LoginResponseModel>>(new JsonSerializerOptions
+            try
             {
-                PropertyNameCaseInsensitive = true
-            });
+                var response = await client.PostAsJsonAsync(apiUrl, model);
 
-            
-            if (!response.IsSuccessStatusCode || result == null || !result.IsSuccess || result.Value == null)
-            {
-                ModelState.AddModelError("", result?.Error ?? "E-posta veya şifre hatalı.");
-                return View(model);
-            }
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError("", "E-posta veya şifre hatalı.");
+                    return View(model);
+                }
+
+                var result = await response.Content.ReadFromJsonAsync<ApiResult<LoginResponseModel>>(new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (result == null || !result.IsSuccess || result.Value == null)
+                {
+                    ModelState.AddModelError("", result?.Error ?? "E-posta veya şifre hatalı.");
+                    return View(model);
+                }
             var token = result.Value.Token;
 
             if (string.IsNullOrEmpty(token))
@@ -62,7 +69,7 @@ namespace HRSupport.UI.Controllers
             Response.Cookies.Append("JwtToken", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = HttpContext.Request.IsHttps,
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddHours(1)
             });
@@ -87,6 +94,17 @@ namespace HRSupport.UI.Controllers
             }
 
             return RedirectToAction("Index", "Home");
+            }
+            catch (JsonException ex)
+            {
+                ModelState.AddModelError("", "Sunucu ile bağlantı sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.");
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.");
+                return View(model);
+            }
         }
 
         [HttpGet]
@@ -112,27 +130,36 @@ namespace HRSupport.UI.Controllers
             }
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Auth/change-password";
-            var response = await client.PostAsJsonAsync(apiUrl, new
-            {
-                CurrentPassword = model.CurrentPassword,
-                NewPassword = model.NewPassword
-            });
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                TempData["SuccessMessage"] = "Şifreniz başarıyla güncellendi. Lütfen yeni şifrenizle tekrar giriş yapın.";
-                await HttpContext.SignOutAsync("HRSupportCookie");
-                Response.Cookies.Delete("JwtToken");
-                return RedirectToAction("Login");
+                var response = await client.PostAsJsonAsync(apiUrl, new
+                {
+                    CurrentPassword = model.CurrentPassword,
+                    NewPassword = model.NewPassword
+                });
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["SuccessMessage"] = "Şifreniz başarıyla güncellendi. Lütfen yeni şifrenizle tekrar giriş yapın.";
+                    await HttpContext.SignOutAsync("HRSupportCookie");
+                    Response.Cookies.Delete("JwtToken");
+                    return RedirectToAction("Login");
+                }
+
+                var errorResult = await response.Content.ReadFromJsonAsync<ApiResult<string>>(new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                ModelState.AddModelError("", errorResult?.Error ?? "Şifre değiştirilemedi.");
+                return View(model);
             }
-
-            var errorResult = await response.Content.ReadFromJsonAsync<ApiResult<string>>(new JsonSerializerOptions
+            catch (Exception ex)
             {
-                PropertyNameCaseInsensitive = true
-            });
-
-            ModelState.AddModelError("", errorResult?.Error ?? "Şifre değiştirilemedi.");
-            return View(model);
+                ModelState.AddModelError("", "Şifre değiştirilemedi. Lütfen daha sonra tekrar deneyiniz.");
+                return View(model);
+            }
         }
 
         public async Task<IActionResult> Logout()

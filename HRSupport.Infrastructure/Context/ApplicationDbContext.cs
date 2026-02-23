@@ -38,13 +38,13 @@ namespace HRSupport.Infrastructure.Context
             {
                 Id = 1,
                 Email = "admin@hepiyi.com",
-                // "Admin123!" şifresinin BCrypt ile hashlenmiş statik halidir.
-                PasswordHash = "$2a$11$S/kP4U1vXw.YQhA.T2JvQ.B0d4aA3n3m3bJ4b8g5a5dG1E4h7iY9O",
+                // "Admin123!" şifresinin BCrypt ile hashlenmiş halidir (oluşturma tarihi: 2026)
+                PasswordHash = "$2a$11$jLrG8Z.qnfVMlHUTDFVKKOuJl68bpPX1Xs9mYRR8BqN3YXfcVxFDm",
                 Role = Roles.Admin,
                 IsPasswordChangeRequired = false,
                 IsDeleted = false,
                 CreatedTime = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             });
         }
-    }
 }
+    }
