@@ -1,5 +1,8 @@
-﻿using HRSupport.Domain.Entites;
+﻿using HRSupport.Domain.Common;
+using HRSupport.Domain.Entites;
+using HRSupport.Domain.Enum;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace HRSupport.Infrastructure.Context
 {
@@ -9,7 +12,6 @@ namespace HRSupport.Infrastructure.Context
         {
         }
 
-        // DbSet ismindeki "Employeess" yazım hatası düzeltildi
         public DbSet<Employee> Employees { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
         public DbSet<Intern> Interns { get; set; }
@@ -19,42 +21,30 @@ namespace HRSupport.Infrastructure.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // ==========================================
-            // 1. EMPLOYEE (ÇALIŞAN) TABLOSU AYARLARI
-            // ==========================================
             modelBuilder.Entity<Employee>().ToTable("Employees");
-
-            // EF Core'un bu property'i veritabanında sütun olarak aramamasını sağlıyoruz
-            modelBuilder.Entity<Employee>().Ignore(e => e.fullname);
+            modelBuilder.Entity<Employee>().Ignore(e => e.Fullname); 
 
             modelBuilder.Entity<Employee>()
                 .Property(e => e.Department)
                 .HasColumnName("Department");
 
-            // HATA VEREN "Createdate" EŞLEŞTİRMESİ KALDIRILDI
-
-            // GLOBAL QUERY FILTER: Sadece silinmemiş olan çalışanları getir
             modelBuilder.Entity<Employee>().HasQueryFilter(e => !e.IsDeleted);
-
-
-            // ==========================================
-            // 2. LEAVEREQUEST (İZİN TALEBİ) TABLOSU AYARLARI
-            // ==========================================
             modelBuilder.Entity<LeaveRequest>().ToTable("LeaveRequests");
-
-            // HATA VEREN "Createdate" EŞLEŞTİRMESİ KALDIRILDI
-
-            // GLOBAL QUERY FILTER: Sadece silinmemiş izin taleplerini getir
             modelBuilder.Entity<LeaveRequest>().HasQueryFilter(e => !e.IsDeleted);
-
-
-            // ==========================================
-            // 3. INTERN (STAJYER) VE USER TABLOSU AYARLARI
-            // ==========================================
-            // Stajyerler ve Kullanıcılar için de varsayılan silinmeme filtresi ekleyebilirsiniz
             modelBuilder.Entity<Intern>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<User>().HasQueryFilter(e => !e.IsDeleted);
+
+            modelBuilder.Entity<User>().HasData(new User
+            {
+                Id = 1,
+                Email = "admin@hepiyi.com",
+                // "Admin123!" şifresinin BCrypt ile hashlenmiş statik halidir.
+                PasswordHash = "$2a$11$S/kP4U1vXw.YQhA.T2JvQ.B0d4aA3n3m3bJ4b8g5a5dG1E4h7iY9O",
+                Role = Roles.Admin,
+                IsPasswordChangeRequired = false,
+                IsDeleted = false,
+                CreatedTime = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            });
         }
     }
 }

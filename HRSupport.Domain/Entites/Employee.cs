@@ -14,7 +14,6 @@ namespace HRSupport.Domain.Entites
         public DateTime StartDate { get; set; }
         public Department Department { get; set; }
         public Roles Roles { get; set; }
-
-        public string fullname => $"{FirstName} {LastName}";
+        public string Fullname => $"{FirstName} {LastName}";
     }
 }

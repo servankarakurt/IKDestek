@@ -3,9 +3,10 @@ using MediatR;
 
 namespace HRSupport.Application.Features.Auth.Commands
 {
-    public class LoginCommand : IRequest<Result<string>> 
+    // Buradaki <Result<string>> kısmını <Result<object>> olarak değiştirdik
+    public class LoginCommand : IRequest<Result<object>>
     {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }

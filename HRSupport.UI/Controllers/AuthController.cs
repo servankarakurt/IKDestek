@@ -39,20 +39,18 @@ namespace HRSupport.UI.Controllers
 
             var response = await client.PostAsJsonAsync(apiUrl, model);
 
-            // 1. API'den gelen veriyi senin Result sınıfına uyan ApiResult sarmalayıcısı ile okuyoruz.
+           
             var result = await response.Content.ReadFromJsonAsync<ApiResult<LoginResponseModel>>(new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
 
-            // 2. Başarısız olursa API'den gelen Error mesajını ekrana basıyoruz.
+            
             if (!response.IsSuccessStatusCode || result == null || !result.IsSuccess || result.Value == null)
             {
                 ModelState.AddModelError("", result?.Error ?? "E-posta veya şifre hatalı.");
                 return View(model);
             }
-
-            // 3. Başarılıysa Token'ı çekiyoruz. (Senin sınıfta Value'nun içinde Token adında property var)
             var token = result.Value.Token;
 
             if (string.IsNullOrEmpty(token))
@@ -128,7 +126,6 @@ namespace HRSupport.UI.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Şifre değiştirme hata verirse yine API'nin Result'ındaki Error mesajını yakalıyoruz
             var errorResult = await response.Content.ReadFromJsonAsync<ApiResult<string>>(new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
