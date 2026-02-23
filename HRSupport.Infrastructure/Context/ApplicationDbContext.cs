@@ -22,7 +22,7 @@ namespace HRSupport.Infrastructure.Context
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Employee>().ToTable("Employees");
-            modelBuilder.Entity<Employee>().Ignore(e => e.Fullname); 
+            modelBuilder.Entity<Employee>().Ignore(e => e.Fullname);
 
             modelBuilder.Entity<Employee>()
                 .Property(e => e.Department)
@@ -34,17 +34,6 @@ namespace HRSupport.Infrastructure.Context
             modelBuilder.Entity<Intern>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<User>().HasQueryFilter(e => !e.IsDeleted);
 
-            modelBuilder.Entity<User>().HasData(new User
-            {
-                Id = 1,
-                Email = "admin@hepiyi.com",
-                // "Admin123!" şifresinin BCrypt ile hashlenmiş halidir (oluşturma tarihi: 2026)
-                PasswordHash = "$2a$11$jLrG8Z.qnfVMlHUTDFVKKOuJl68bpPX1Xs9mYRR8BqN3YXfcVxFDm",
-                Role = Roles.Admin,
-                IsPasswordChangeRequired = false,
-                IsDeleted = false,
-                CreatedTime = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            });
         }
-}
     }
+}

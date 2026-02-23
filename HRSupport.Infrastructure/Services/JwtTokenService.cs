@@ -19,40 +19,33 @@ namespace HRSupport.Infrastructure.Services
             _configuration = configuration;
         }
 
+        // --- 1. TOKEN OLUŞTURMA METODU (Sizin kodunuz) ---
         public string GenerateToken(User user)
         {
-            // 1. appsettings.json'dan gizli anahtarımızı ve diğer ayarları okuyoruz
             var jwtSettings = _configuration.GetSection("JwtSettings");
 
-            // 2. Değerleri okuyoruz (Eğer appsettings.json'da bulamazsa hata vermemesi için '??' ile fallback ekledik)
             var secretKey = jwtSettings["SecretKey"]
                 ?? throw new InvalidOperationException("JWT Secret key is missing in configuration.");
 
             var issuer = jwtSettings["Issuer"] ?? "HRSupportAPI";
             var audience = jwtSettings["Audience"] ?? "HRSupportUser";
 
-            // 3. Süre bilgisini okuyoruz (Varsayılan 60 dakika)
             var expiryMinutesStr = jwtSettings["ExpiryMinutes"];
             var expiryMinutes = !string.IsNullOrEmpty(expiryMinutesStr)
                 ? Convert.ToInt32(expiryMinutesStr)
                 : 60;
 
-            // 2. Gizli anahtarı byte dizisine çeviriyoruz
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            // 3. Token'ın içine gömeceğimiz kullanıcı bilgileri (Claims)
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim("IsPasswordChangeRequired", user.IsPasswordChangeRequired.ToString()),
-                // Kullanıcının rolünü (Admin,IK, Employee) token'a ekliyoruz ki yetkilendirme yapabilelim
                 new Claim(ClaimTypes.Role, user.Role.ToString())
-
             };
 
-            // 4. Token ayarlarını birleştirip oluşturuyoruz
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
@@ -65,8 +58,54 @@ namespace HRSupport.Infrastructure.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            // 5. Şifrelenmiş metni string olarak geri dönüyoruz
             return tokenHandler.WriteToken(token);
+        }
+
+        // --- 2. YENİ EKLENEN MANUEL TOKEN DOĞRULAMA METODU ---
+        public bool ValidateToken(string token, out JwtSecurityToken? jwt)
+        {
+            jwt = null;
+
+            if (string.IsNullOrWhiteSpace(token))
+                return false;
+
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+
+            var secretKey = jwtSettings["SecretKey"]
+                ?? throw new InvalidOperationException("JWT Secret key is missing in configuration.");
+
+            var issuer = jwtSettings["Issuer"] ?? "HRSupportAPI";
+            var audience = jwtSettings["Audience"] ?? "HRSupportUser";
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(secretKey);
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = issuer,
+                ValidateAudience = true,
+                ValidAudience = audience,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero // Süresi dolan token'a verilen 5 dakikalık toleransı kaldırır
+            };
+
+            try
+            {
+                // Token çözülmeye ve doğrulanmaya çalışılır
+                tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+
+                // Başarılı olursa dışarıya fırlatılır
+                jwt = (JwtSecurityToken)validatedToken;
+                return true;
+            }
+            catch (Exception)
+            {
+                // Token bozuksa, imza yanlışsa veya süresi geçmişse buraya düşer
+                return false;
+            }
         }
     }
 }

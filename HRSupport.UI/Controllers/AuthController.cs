@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
+using Flurl.Http;
 
 namespace HRSupport.UI.Controllers
 {
@@ -121,43 +122,56 @@ namespace HRSupport.UI.Controllers
                 return View(model);
             }
 
-            var client = _httpClientFactory.CreateClient();
+            // 1. Çerezi oku ve kontrol et
             var token = Request.Cookies["JwtToken"];
-
-            if (!string.IsNullOrEmpty(token))
+            if (string.IsNullOrEmpty(token))
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                ModelState.AddModelError("", "Oturum süreniz dolmuş veya token bulunamadı. Lütfen tekrar giriş yapın.");
+                return View(model);
             }
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Auth/change-password";
 
             try
             {
-                var response = await client.PostAsJsonAsync(apiUrl, new
-                {
-                    CurrentPassword = model.CurrentPassword,
-                    NewPassword = model.NewPassword
-                });
+                // 2. İsteği Flurl ile at
+                // .WithOAuthBearerToken(token) metodu doğrudan "Authorization: Bearer <token>" header'ını ekler.
+                var response = await apiUrl
+                    .WithHeader("Authorization", $"Bearer {token}")
+                    .PostJsonAsync(new
+                    {
+                        CurrentPassword = model.CurrentPassword,
+                        NewPassword = model.NewPassword
+                    });
 
-                if (response.IsSuccessStatusCode)
+                // Flurl'de 2xx (başarılı) dönmezse exception fırlar. 
+                // Kod buraya ulaştıysa işlem kesinlikle başarılıdır.
+                TempData["SuccessMessage"] = "Şifreniz başarıyla güncellendi. Lütfen yeni şifrenizle tekrar giriş yapın.";
+                await HttpContext.SignOutAsync("HRSupportCookie");
+                Response.Cookies.Delete("JwtToken");
+                return RedirectToAction("Login");
+            }
+            catch (FlurlHttpException ex)
+            {
+                // 3. API'den hata döndüyse (Örn: 400 BadRequest veya 401 Unauthorized) buraya düşer
+                try
                 {
-                    TempData["SuccessMessage"] = "Şifreniz başarıyla güncellendi. Lütfen yeni şifrenizle tekrar giriş yapın.";
-                    await HttpContext.SignOutAsync("HRSupportCookie");
-                    Response.Cookies.Delete("JwtToken");
-                    return RedirectToAction("Login");
+                    // API'nin döndüğü ApiResult<string> formatındaki hatayı okuyoruz
+                    var errorResult = await ex.GetResponseJsonAsync<ApiResult<string>>();
+                    ModelState.AddModelError("", errorResult?.Error ?? "Şifre değiştirilemedi.");
+                }
+                catch
+                {
+                    // Json parse edilemezse genel hata
+                    ModelState.AddModelError("", "Şifre değiştirilirken bir hata oluştu veya yetkiniz yok.");
                 }
 
-                var errorResult = await response.Content.ReadFromJsonAsync<ApiResult<string>>(new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                ModelState.AddModelError("", errorResult?.Error ?? "Şifre değiştirilemedi.");
                 return View(model);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Şifre değiştirilemedi. Lütfen daha sonra tekrar deneyiniz.");
+                // Sunucuya hiç ulaşılamazsa (Timeout vs.) buraya düşer
+                ModelState.AddModelError("", "Sunucu ile bağlantı kurulamadı. Lütfen daha sonra tekrar deneyiniz.");
                 return View(model);
             }
         }

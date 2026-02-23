@@ -3,6 +3,7 @@ using HRSupport.Application.Interfaces;
 using HRSupport.Infrastructure.Context;
 using HRSupport.Infrastructure.Repositories;
 using HRSupport.Infrastructure.Services;
+using HRSupport.WebAPI.Middlewares.HRSupport.WebAPI.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -39,7 +40,7 @@ builder.Services.AddAutoMapper(typeof(HRSupport.Application.Mappings.MappingProf
 
 //5. JWT Kimlik Doğrulama Ayarları
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["Secret"] ?? "Baziciceklerbazitopraklarayesermezyaninasipteyoksaisrarinluzmuyoktur!";
+var secretKey = jwtSettings["SecretKey"] ?? "Baziciceklerbazitopraklarayesermezyaninasipteyoksaisrarinluzmuyoktur!";
 
 builder.Services.AddAuthorization();
 
@@ -57,7 +58,7 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
+        ValidAudiences = jwtSettings.GetSection("Audience").Get<string[]>(),
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
 });
@@ -78,9 +79,10 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+app.UseMiddleware<JwtMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
