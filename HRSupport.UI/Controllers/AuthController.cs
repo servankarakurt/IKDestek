@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace HRSupport.UI.Controllers
 {
@@ -38,14 +39,21 @@ namespace HRSupport.UI.Controllers
 
             var response = await client.PostAsJsonAsync(apiUrl, model);
 
-            if (!response.IsSuccessStatusCode)
+            // 1. API'den gelen veriyi senin Result sınıfına uyan ApiResult sarmalayıcısı ile okuyoruz.
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<LoginResponseModel>>(new JsonSerializerOptions
             {
-                ModelState.AddModelError("", "E-posta veya şifre hatalı.");
+                PropertyNameCaseInsensitive = true
+            });
+
+            // 2. Başarısız olursa API'den gelen Error mesajını ekrana basıyoruz.
+            if (!response.IsSuccessStatusCode || result == null || !result.IsSuccess || result.Value == null)
+            {
+                ModelState.AddModelError("", result?.Error ?? "E-posta veya şifre hatalı.");
                 return View(model);
             }
 
-            var result = await response.Content.ReadFromJsonAsync<ApiResponse<LoginResponseModel>>();
-            var token = result?.Value?.Token;
+            // 3. Başarılıysa Token'ı çekiyoruz. (Senin sınıfta Value'nun içinde Token adında property var)
+            var token = result.Value.Token;
 
             if (string.IsNullOrEmpty(token))
             {
@@ -99,7 +107,11 @@ namespace HRSupport.UI.Controllers
 
             var client = _httpClientFactory.CreateClient();
             var token = Request.Cookies["JwtToken"];
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Auth/change-password";
             var response = await client.PostAsJsonAsync(apiUrl, new
@@ -116,8 +128,13 @@ namespace HRSupport.UI.Controllers
                 return RedirectToAction("Login");
             }
 
-            var error = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
-            ModelState.AddModelError("", error?.Message ?? "Şifre değiştirilemedi.");
+            // Şifre değiştirme hata verirse yine API'nin Result'ındaki Error mesajını yakalıyoruz
+            var errorResult = await response.Content.ReadFromJsonAsync<ApiResult<string>>(new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            ModelState.AddModelError("", errorResult?.Error ?? "Şifre değiştirilemedi.");
             return View(model);
         }
 
