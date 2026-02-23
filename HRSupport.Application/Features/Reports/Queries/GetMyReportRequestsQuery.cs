@@ -6,6 +6,6 @@ namespace HRSupport.Application.Features.Reports.Queries
 {
     public class GetMyReportRequestsQuery : IRequest<Result<IEnumerable<WeeklyReportRequest>>>
     {
-        public int UserId { get; set; }
+        public int EmployeeId { get; set; }
     }
 }

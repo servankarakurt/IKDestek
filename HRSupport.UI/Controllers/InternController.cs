@@ -1,11 +1,8 @@
 using HRSupport.UI.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
 
 namespace HRSupport.UI.Controllers
 {
-    [Authorize]
     public class InternController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -20,23 +17,20 @@ namespace HRSupport.UI.Controllers
         public async Task<IActionResult> Index()
         {
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["JwtToken"]);
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern";
-            var response = await client.GetFromJsonAsync<ApiResponse<List<InternViewModel>>>(apiUrl);
+            var response = await client.GetFromJsonAsync<ApiResult<List<InternViewModel>>>(apiUrl);
 
             return View(response?.Value ?? new List<InternViewModel>());
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(CreateInternViewModel model)
         {
             if (!ModelState.IsValid)
@@ -45,19 +39,39 @@ namespace HRSupport.UI.Controllers
             }
 
             var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["JwtToken"]);
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern/create";
-            var response = await client.PostAsJsonAsync(apiUrl, model);
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var result = await response.Content.ReadFromJsonAsync<ApiResponse<int>>();
-                TempData["TempPasswordInfo"] = result?.Message;
-                return RedirectToAction(nameof(Index));
+                var response = await client.PostAsJsonAsync(apiUrl, model);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResult<int>>();
+                    TempData["TempPasswordInfo"] = result?.Error ?? "Stajyer başarıyla eklendi.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Hata durumunda detaylı bilgi al
+                try
+                {
+                    var errorResult = await response.Content.ReadFromJsonAsync<ApiResult<int>>();
+                    if (errorResult != null)
+                        ModelState.AddModelError("", errorResult.Error ?? $"Bir hata oluştu. ({response.StatusCode})");
+                    else
+                        ModelState.AddModelError("", $"Sunucu hatası: {response.StatusCode}");
+                }
+                catch
+                {
+                    ModelState.AddModelError("", $"Sunucu hatası: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Bağlantı hatası: {ex.Message}");
             }
 
-            ModelState.AddModelError("", "Stajyer eklenirken bir hata oluştu.");
             return View(model);
         }
     }

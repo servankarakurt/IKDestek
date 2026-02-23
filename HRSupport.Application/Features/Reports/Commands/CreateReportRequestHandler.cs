@@ -10,30 +10,21 @@ namespace HRSupport.Application.Features.Reports.Commands
     {
         private readonly IWeeklyReportRepository _weeklyReportRepository;
         private readonly IEmployeeRepository _employeeRepository;
-        private readonly IUserRepository _userRepository;
         private readonly ILogger<CreateReportRequestHandler> _logger;
 
         public CreateReportRequestHandler(
             IWeeklyReportRepository weeklyReportRepository,
             IEmployeeRepository employeeRepository,
-            IUserRepository userRepository,
             ILogger<CreateReportRequestHandler> logger)
         {
             _weeklyReportRepository = weeklyReportRepository;
             _employeeRepository = employeeRepository;
-            _userRepository = userRepository;
             _logger = logger;
         }
 
         public async Task<Result<int>> Handle(CreateReportRequestCommand request, CancellationToken cancellationToken)
         {
-            var managerUser = await _userRepository.GetByIdAsync(request.ManagerUserId);
-            if (managerUser == null)
-            {
-                return Result<int>.Failure("Yönetici kullanıcı kaydı bulunamadı.");
-            }
-
-            var managerEmployee = await _employeeRepository.GetByEmailAsync(managerUser.Email);
+            var managerEmployee = await _employeeRepository.GetByIdAsync(request.ManagerEmployeeId);
             if (managerEmployee == null)
             {
                 return Result<int>.Failure("Yönetici personel kaydı bulunamadı.");
@@ -58,8 +49,8 @@ namespace HRSupport.Application.Features.Reports.Commands
             var createdCount = await _weeklyReportRepository.AddRangeAsync(reportRequests);
 
             _logger.LogInformation(
-                "ManagerUserId {ManagerUserId} tarafından Department {Department} için {Count} kişiye haftalık rapor talebi gönderildi.",
-                request.ManagerUserId,
+                "ManagerEmployeeId {ManagerEmployeeId} tarafından Department {Department} için {Count} kişiye haftalık rapor talebi gönderildi.",
+                request.ManagerEmployeeId,
                 managerEmployee.Department,
                 createdCount);
 

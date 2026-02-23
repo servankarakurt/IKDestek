@@ -13,9 +13,9 @@ namespace HRSupport.UI.Models
         [Display(Name = "Telefon")]
         public string Phone { get; set; } = string.Empty;
         [Display(Name = "Departman")]
-        public int Department { get; set; } // Enum ID'si olarak gelecek
+        public string Department { get; set; } = string.Empty; // Enum string olarak geliyor
         [Display(Name = "Rol")]
-        public int Roles { get; set; }
+        public string Roles { get; set; } = string.Empty; // Enum string olarak geliyor
         [Display(Name = "İşe Başlama")]
         public DateTime StartDate { get; set; }
         public string FullName => $"{FirstName} {LastName}";

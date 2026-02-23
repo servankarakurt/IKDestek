@@ -15,7 +15,6 @@ namespace HRSupport.Infrastructure.Context
         public DbSet<Employee> Employees { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
         public DbSet<Intern> Interns { get; set; }
-        public DbSet<User> Users { get; set; }
         public DbSet<WeeklyReportRequest> WeeklyReportRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,7 +31,6 @@ namespace HRSupport.Infrastructure.Context
             modelBuilder.Entity<LeaveRequest>().ToTable("LeaveRequests");
             modelBuilder.Entity<LeaveRequest>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Intern>().HasQueryFilter(e => !e.IsDeleted);
-            modelBuilder.Entity<User>().HasQueryFilter(e => !e.IsDeleted);
 
         }
     }

@@ -10,6 +10,7 @@ namespace HRSupport.UI.Models
         [Display(Name = "Soyad")]
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
         [Display(Name = "Üniversite")]
         public string? University { get; set; }
         [Display(Name = "Bölüm")]
@@ -20,6 +21,7 @@ namespace HRSupport.UI.Models
         public DateTime StartDate { get; set; }
         [Display(Name = "Bitiş")]
         public DateTime EndDate { get; set; }
+        public string? MentorName { get; set; }
         public string FullName => $"{FirstName} {LastName}";
     }
 

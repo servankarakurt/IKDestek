@@ -1,13 +1,11 @@
 ﻿using HRSupport.Application.Features.Dashboard.Queries;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRSupport.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-     [Authorize] 
     public class DashboardController : ControllerBase
     {
         private readonly IMediator _mediator;

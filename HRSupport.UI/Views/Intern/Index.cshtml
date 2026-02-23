@@ -1,38 +1,97 @@
 ﻿@model List<HRSupport.UI.Models.InternViewModel>
-<div class="container mt-4">
-@if (TempData["TempPasswordInfo"] != null)
-{
-    <div class="alert alert-success">@TempData["TempPasswordInfo"]</div>
-}
+@{ ViewData["Title"] = "Stajyer Yönetimi"; }
 
-
-    <div class="d-flex justify-content-between mb-3">
-        <h2>Stajyer Takip Listesi</h2>
-        <a asp-action="Create" class="btn btn-success">+ Yeni Stajyer Kaydı</a>
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold text-dark">
+                <i class="bi bi-mortarboard-fill text-success me-2"></i>Stajyerler
+            </h1>
+            <p class="text-muted">Toplam: <strong>@Model.Count</strong> aktif stajyer</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a asp-action="Create" asp-controller="Intern" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle me-2"></i>Yeni Stajyer Kaydı
+            </a>
+        </div>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover shadow-sm border">
-            <thead class="table-primary">
-                <tr>
-                    <th>Ad Soyad</th>
-                    <th>Üniversite</th>
-                    <th>Sınıf</th>
-                    <th>Staj Dönemi</th>
-                    <th>Durum</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var intern in Model)
-                {
-                    <tr>
-                        <td><strong>@intern.FullName</strong><br /><small>@intern.Email</small></td>
-                        <td>@intern.University / @intern.Major</td>
-                        <td>@intern.Grade. Sınıf</td>
-                        <td>@intern.StartDate.ToShortDateString() - @intern.EndDate.ToShortDateString()</td>
-                        <td><span class="badge bg-info text-dark">Aktif Stajyer</span></td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+
+    @if (TempData["TempPasswordInfo"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            <strong>Başarılı!</strong> @TempData["TempPasswordInfo"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            @if (Model?.Count > 0)
+            {
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light border-bottom">
+                        <tr>
+                            <th class="fw-bold text-dark">Ad Soyad</th>
+                            <th class="fw-bold text-dark">Üniversite</th>
+                            <th class="fw-bold text-dark">Program</th>
+                            <th class="fw-bold text-dark">Sınıf</th>
+                            <th class="fw-bold text-dark">Staj Dönemi</th>
+                            <th class="fw-bold text-dark">Mentor</th>
+                            <th class="fw-bold text-center text-dark">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var intern in Model)
+                        {
+                            <tr class="align-middle">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-success rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; color: white; font-weight: bold;">
+                                            @((intern.FirstName?.FirstOrDefault() ?? 'X').ToString().ToUpper())@((intern.LastName?.FirstOrDefault() ?? 'X').ToString().ToUpper())
+                                        </div>
+                                        <div>
+                                            <strong>@intern.FullName</strong><br />
+                                            <small class="text-muted">@intern.Email</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@intern.University</td>
+                                <td>@intern.Major</td>
+                                <td>
+                                    <span class="badge bg-primary">@intern.Grade. Sınıf</span>
+                                </td>
+                                <td>
+                                    <small>@intern.StartDate.ToString("dd.MM.yyyy") - @intern.EndDate.ToString("dd.MM.yyyy")</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">@intern.MentorName</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="#" class="btn btn-outline-primary" title="Düzenle">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-outline-danger" title="Sil">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3">Henüz stajyer kaydı yok.</p>
+                    <a asp-action="Create" asp-controller="Intern" class="btn btn-success mt-3">
+                        <i class="bi bi-plus-circle me-2"></i>İlk Stajyeri Ekle
+                    </a>
+                </div>
+            }
+        </div>
     </div>
 </div>

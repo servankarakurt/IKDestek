@@ -1,11 +1,8 @@
 using HRSupport.UI.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
 
 namespace HRSupport.UI.Controllers
 {
-    [Authorize]
     public class LeaveRequestController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -25,19 +22,11 @@ namespace HRSupport.UI.Controllers
             try
             {
                 var client = _httpClientFactory.CreateClient();
-                
-                if (!Request.Cookies.TryGetValue("JwtToken", out var token) || string.IsNullOrEmpty(token))
-                {
-                    _logger.LogWarning("JWT Token bulunamadı. Giriş sayfasına yönlendir.");
-                    return RedirectToAction("Login", "Auth");
-                }
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/GetAll";
                 _logger.LogInformation($"API çağrısı: {apiUrl}");
-                
-                var response = await client.GetFromJsonAsync<ApiResponse<List<LeaveRequestViewModel>>>(apiUrl);
+
+                var response = await client.GetFromJsonAsync<ApiResult<List<LeaveRequestViewModel>>>(apiUrl);
 
                 return View(response?.Value ?? new List<LeaveRequestViewModel>());
             }
@@ -66,13 +55,6 @@ namespace HRSupport.UI.Controllers
             try
             {
                 var client = _httpClientFactory.CreateClient();
-                
-                if (!Request.Cookies.TryGetValue("JwtToken", out var token) || string.IsNullOrEmpty(token))
-                {
-                    return RedirectToAction("Login", "Auth");
-                }
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/Create";
                 var response = await client.PostAsJsonAsync(apiUrl, model);

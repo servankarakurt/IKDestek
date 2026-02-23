@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using HRSupport.Application.DTOs;
+using HRSupport.Application.Features.Employees.Commans;
+using HRSupport.Application.Features.Interns.Commands;
 using HRSupport.Domain.Entites;
 
 namespace HRSupport.Application.Mappings
@@ -8,6 +10,12 @@ namespace HRSupport.Application.Mappings
     {
         public MappingProfile()
         {
+            // CreateEmployeeCommand -> Employee çevirisi
+            CreateMap<CreateEmployeeCommand, Employee>();
+
+            // CreateInternCommand -> Intern çevirisi
+            CreateMap<CreateInternCommand, Intern>();
+
             // Employee -> EmployeeDto çevirisi
             CreateMap<Employee, EmployeeDto>()
                 .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.Department.ToString()))
