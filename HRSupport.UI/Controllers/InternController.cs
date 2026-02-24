@@ -1,5 +1,6 @@
 using HRSupport.UI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HRSupport.UI.Controllers
 {
@@ -87,6 +88,7 @@ namespace HRSupport.UI.Controllers
                 return NotFound();
             }
 
+            await LoadMentorsAsync();
             return View(response.Value);
         }
 
@@ -114,7 +116,26 @@ namespace HRSupport.UI.Controllers
                 ModelState.AddModelError("", $"Bağlantı hatası: {ex.Message}");
             }
 
+            await LoadMentorsAsync();
             return View(model);
+        }
+
+        private async Task LoadMentorsAsync()
+        {
+            var client = _httpClientFactory.CreateClient();
+            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Employee";
+
+            try
+            {
+                var response = await client.GetFromJsonAsync<ApiResult<List<EmployeeLookupViewModel>>>(apiUrl);
+                var mentors = response?.Value ?? new List<EmployeeLookupViewModel>();
+
+                ViewBag.Mentors = new SelectList(mentors, "Id", "FullName");
+            }
+            catch
+            {
+                ViewBag.Mentors = new SelectList(Enumerable.Empty<EmployeeLookupViewModel>(), "Id", "FullName");
+            }
         }
     }
 }

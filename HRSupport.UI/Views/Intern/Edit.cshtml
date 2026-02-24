@@ -1,4 +1,4 @@
-﻿@model HRSupport.UI.Models.UpdateInternViewModel
+@model HRSupport.UI.Models.UpdateInternViewModel
 @{
     ViewData["Title"] = "Stajyer Düzenle";
 }
@@ -68,6 +68,36 @@
                                     <input asp-for="EndDate" type="date" class="form-control rounded-3" value="@Model.EndDate.ToString("yyyy-MM-dd")" required />
                                     <label asp-for="EndDate">Bitiş Tarihi</label>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="University" class="form-control rounded-3" placeholder="Üniversite" />
+                                    <label asp-for="University">Üniversite</label>
+                                </div>
+                                <span asp-validation-for="University" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Major" class="form-control rounded-3" placeholder="Bölüm" />
+                                    <label asp-for="Major">Bölüm</label>
+                                </div>
+                                <span asp-validation-for="Major" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select asp-for="MentorId" class="form-select rounded-3"
+                                            asp-items="ViewBag.Mentors">
+                                        <option value="">Mentor seçiniz</option>
+                                    </select>
+                                    <label asp-for="MentorId">Mentor</label>
+                                </div>
+                                <span asp-validation-for="MentorId" class="text-danger small"></span>
                             </div>
                         </div>
 

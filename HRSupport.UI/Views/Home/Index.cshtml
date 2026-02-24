@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Giriş - İK Destek";
 }
 
@@ -14,7 +14,7 @@
         </div>
 
         <div class="row gy-4 justify-content-center landing-row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card shadow-sm h-100 text-center p-4 rounded-4 landing-card">
                     <img src="/images/HR.jpg" alt="İK" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
                     <h4 class="fw-bold">İK Girişi</h4>
@@ -23,7 +23,16 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100 text-center p-4 rounded-4 landing-card">
+                    <img src="~/images/Manager.jpg" alt="Yönetici" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
+                    <h4 class="fw-bold">Yönetici Girişi</h4>
+                    <p class="text-muted">Ekip yönetimi ve izin onay süreçleri için yönetici paneline giriş yapın.</p>
+                    <a class="btn btn-info mt-2 px-4 text-white" asp-controller="Auth" asp-action="Login" asp-route-role="Manager">Giriş Yap</a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
                 <div class="card shadow-sm h-100 text-center p-4 rounded-4 landing-card">
                     <img src="~/images/Employee.jpg" alt="Çalışan" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
                     <h4 class="fw-bold">Çalışan Girişi</h4>
@@ -32,7 +41,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card shadow-sm h-100 text-center p-4 rounded-4 landing-card">
                     <img src="~/images/Intern.jpg" alt="Stajyer" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
                     <h4 class="fw-bold">Stajyer Girişi</h4>

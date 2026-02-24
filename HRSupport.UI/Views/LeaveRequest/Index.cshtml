@@ -89,9 +89,7 @@
                                         <a asp-action="Edit" asp-controller="LeaveRequest" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Düzenle">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a href="#" class="btn btn-outline-danger" title="Sil" onclick="return confirm('Silmek istediğinizden emin misiniz?')">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
+                                        @* İleride yönetici / IK için onay-red butonları burada genişletilebilir *@
                                     </div>
                                 </td>
                             </tr>
