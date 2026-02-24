@@ -56,7 +56,7 @@ namespace HRSupport.UI.Controllers
             {
                 var client = _httpClientFactory.CreateClient();
 
-                var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/Create";
+                var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest";
                 var response = await client.PostAsJsonAsync(apiUrl, model);
 
                 if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
@@ -66,6 +66,49 @@ namespace HRSupport.UI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"İzin talebi oluşturma hatası: {ex.Message}");
+                ModelState.AddModelError("", "Bir hata oluştu. Lütfen tekrar deneyin.");
+            }
+
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/LeaveRequest/{id}";
+
+            var response = await client.GetFromJsonAsync<ApiResult<UpdateLeaveRequestViewModel>>(apiUrl);
+
+            if (response == null || !response.IsSuccess || response.Value == null) return NotFound();
+
+            return View(response.Value);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(UpdateLeaveRequestViewModel model)
+        {
+            if (model.StartDate >= model.EndDate)
+            {
+                ModelState.AddModelError("", "Başlangıç tarihi bitiş tarihinden büyük veya eşit olamaz.");
+                return View(model);
+            }
+
+            if (!ModelState.IsValid) return View(model);
+
+            var client = _httpClientFactory.CreateClient();
+            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/update";
+
+            try
+            {
+                var response = await client.PutAsJsonAsync(apiUrl, model);
+
+                if (response.IsSuccessStatusCode) return RedirectToAction(nameof(Index));
+
+                ModelState.AddModelError("", "İzin talebi güncellenirken bir hata oluştu.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"İzin talebi güncelleme hatası: {ex.Message}");
                 ModelState.AddModelError("", "Bir hata oluştu. Lütfen tekrar deneyin.");
             }
 

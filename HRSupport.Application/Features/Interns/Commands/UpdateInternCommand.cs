@@ -1,13 +1,14 @@
-﻿using System;
+using HRSupport.Application.Common;
+using MediatR;
+using System;
 
-namespace HRSupport.Application.DTOs
+namespace HRSupport.Application.Features.Interns.Commands
 {
-    public class InternDto
+    public class UpdateInternCommand : IRequest<Result<int>>
     {
         public int Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string? University { get; set; }
@@ -15,6 +16,7 @@ namespace HRSupport.Application.DTOs
         public int Grade { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public string? MentorName { get; set; }
+        public int? MentorId { get; set; }
     }
 }
+

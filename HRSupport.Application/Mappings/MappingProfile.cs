@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using HRSupport.Application.DTOs;
 using HRSupport.Application.Features.Employees.Commans;
 using HRSupport.Application.Features.Interns.Commands;
@@ -18,7 +18,8 @@ namespace HRSupport.Application.Mappings
 
             // Employee -> EmployeeDto çevirisi
             CreateMap<Employee, EmployeeDto>()
-                .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.Department.ToString()))
+                .ForMember(dest => dest.Department, opt => opt.MapFrom(src => (int)src.Department))
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => (int)src.Roles))
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"));
 
             // Intern -> InternDto çevirisi

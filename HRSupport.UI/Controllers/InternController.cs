@@ -74,5 +74,47 @@ namespace HRSupport.UI.Controllers
 
             return View(model);
         }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/Intern/{id}";
+
+            var response = await client.GetFromJsonAsync<ApiResult<UpdateInternViewModel>>(apiUrl);
+
+            if (response == null || !response.IsSuccess || response.Value == null)
+            {
+                return NotFound();
+            }
+
+            return View(response.Value);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(UpdateInternViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var client = _httpClientFactory.CreateClient();
+            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern/update";
+
+            try
+            {
+                var response = await client.PutAsJsonAsync(apiUrl, model);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["TempPasswordInfo"] = "Stajyer başarıyla güncellendi.";
+                    return RedirectToAction(nameof(Index));
+                }
+                ModelState.AddModelError("", "Güncelleme sırasında bir hata oluştu.");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Bağlantı hatası: {ex.Message}");
+            }
+
+            return View(model);
+        }
     }
 }

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="image\" />
     <Folder Include="Views\Auth\" />
   </ItemGroup>
 

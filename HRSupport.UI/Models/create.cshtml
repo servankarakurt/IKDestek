@@ -1,0 +1,120 @@
+﻿@model HRSupport.UI.Models.CreateEmployeeViewModel
+
+@{
+    ViewData["Title"] = "Yeni Çalışan Ekle";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary bg-gradient text-white p-4">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-person-badge me-2"></i>Yeni Çalışan Kaydı</h4>
+                    <small class="text-white-50">Lütfen çalışan bilgilerini eksiksiz doldurun.</small>
+                </div>
+                <div class="card-body p-5 bg-light">
+
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">Kişisel Bilgiler</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="FirstName" class="form-control rounded-3" placeholder="Ad" required />
+                                    <label asp-for="FirstName">Ad</label>
+                                </div>
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="LastName" class="form-control rounded-3" placeholder="Soyad" required />
+                                    <label asp-for="LastName">Soyad</label>
+                                </div>
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="BirthDate" type="date" class="form-control rounded-3" required />
+                                    <label asp-for="BirthDate">Doğum Tarihi</label>
+                                </div>
+                                <span asp-validation-for="BirthDate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="CardID" type="number" class="form-control rounded-3" placeholder="Kart ID" required />
+                                    <label asp-for="CardID">Giriş Kartı ID</label>
+                                </div>
+                                <span asp-validation-for="CardID" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">İletişim Bilgileri</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Email" type="email" class="form-control rounded-3" placeholder="E-Posta" required />
+                                    <label asp-for="Email">E-Posta Adresi</label>
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Phone" type="tel" class="form-control rounded-3" placeholder="Telefon" required />
+                                    <label asp-for="Phone">Telefon Numarası</label>
+                                </div>
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">Şirket Bilgileri</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input asp-for="StartDate" type="date" class="form-control rounded-3" required />
+                                    <label asp-for="StartDate">İşe Başlama Tarihi</label>
+                                </div>
+                                <span asp-validation-for="StartDate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select asp-for="Department" class="form-select rounded-3" required>
+                                        <option value="">Seçiniz...</option>
+                                        <option value="1">Yazılım</option>
+                                        <option value="2">İnsan Kaynakları</option>
+                                        <option value="3">Muhasebe</option>
+                                    </select>
+                                    <label asp-for="Department">Departman</label>
+                                </div>
+                                <span asp-validation-for="Department" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select asp-for="Roles" class="form-select rounded-3" required>
+                                        <option value="1">Admin</option>
+                                        <option value="2">HR</option>
+                                        <option value="3">Manager</option>
+                                        <option value="4" selected>Employee</option>
+                                    </select>
+                                    <label asp-for="Roles">Sistem Rolü</label>
+                                </div>
+                                <span asp-validation-for="Roles" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <a asp-action="Index" class="btn btn-light border-secondary px-4 py-2 rounded-3 shadow-sm fw-bold">İptal</a>
+                            <button type="submit" class="btn btn-primary px-5 py-2 rounded-3 shadow fw-bold">
+                                <i class="bi bi-save me-2"></i>Kaydet
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

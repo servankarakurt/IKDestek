@@ -1,0 +1,39 @@
+:root{
+  --primary:#0d6efd;
+  --success:#198754;
+  --warning:#fd7e14;
+}
+
+/* Layout */
+.d-flex.vh-100{background:linear-gradient(180deg,#f8fafc, #ffffff)}
+
+.landing-row .col-md-4{display:flex}
+.landing-card{flex:1; border:none; background: #fff; transition: transform .36s cubic-bezier(.2,.9,.2,1), box-shadow .36s; will-change: transform; padding:1.5rem}
+.landing-card img{height:120px; width:auto; margin:0 auto 1rem; display:block; animation: float 6s ease-in-out infinite}
+
+.landing-card:hover{transform:translateY(-10px) scale(1.02); box-shadow:0 20px 45px rgba(16,24,40,0.08)}
+.landing-card .btn{transition:transform .18s ease, box-shadow .18s ease}
+.landing-card .btn:hover{transform:translateY(-2px); box-shadow:0 10px 20px rgba(16,24,40,0.08)}
+
+/* Floating image */
+@keyframes float{
+  0%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+  100%{transform:translateY(0)}
+}
+
+/* Entrance animation */
+.landing-card{opacity:0; transform:translateY(12px);}
+.landing-row .col-md-4:nth-child(1) .landing-card{animation:fadeInUp .6s ease both .08s}
+.landing-row .col-md-4:nth-child(2) .landing-card{animation:fadeInUp .6s ease both .18s}
+.landing-row .col-md-4:nth-child(3) .landing-card{animation:fadeInUp .6s ease both .28s}
+
+@keyframes fadeInUp{
+  to{opacity:1; transform:translateY(0)}
+}
+
+/* Responsive tweaks */
+@media (max-width:767px){
+  .landing-card{padding:1rem}
+  .landing-card img{height:96px}
+}

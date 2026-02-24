@@ -22,8 +22,17 @@ namespace HRSupport.WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var result = await _mediator.Send(new GetAllEmployeesQuery());
-            return Ok(result);
+            try
+            {
+                var result = await _mediator.Send(new GetAllEmployeesQuery());
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching employee list");
+                // Return problem details to help debugging in development
+                return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace });
+            }
         }
 
         [HttpGet("{id}")]

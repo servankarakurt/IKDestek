@@ -41,4 +41,21 @@ namespace HRSupport.UI.Models
         public DateTime EndDate { get; set; } = DateTime.Now.AddMonths(3);
         public int? MentorId { get; set; } // Bir Employee ID'si
     }
+    public class UpdateInternViewModel
+    {
+        public int Id { get; set; }
+        [Required(ErrorMessage = "Ad zorunludur")]
+        public string FirstName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Soyad zorunludur")]
+        public string LastName { get; set; } = string.Empty;
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string? University { get; set; }
+        public string? Major { get; set; }
+        public int Grade { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int? MentorId { get; set; }
+    }
 }

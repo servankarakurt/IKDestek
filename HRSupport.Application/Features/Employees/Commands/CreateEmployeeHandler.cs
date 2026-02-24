@@ -5,6 +5,8 @@ using HRSupport.Application.Interfaces;
 using HRSupport.Domain.Entites;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace HRSupport.Application.Features.Employees.Commands
 {
@@ -27,11 +29,44 @@ namespace HRSupport.Application.Features.Employees.Commands
         public async Task<Result<int>> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
             var employee = _mapper.Map<Employee>(request);
+
+            // Generate a temporary password for the new user and store its hash
+            var tempPassword = GenerateTemporaryPassword(10);
+            employee.PasswordHash = HashPassword(tempPassword);
+            employee.MustChangePassword = true;
+
             var employeeId = await _employeeRepository.AddAsync(employee);
 
             _logger.LogInformation("Employee created. EmployeeId: {EmployeeId}, Email: {Email}", employeeId, request.Email);
 
-            return Result<int>.Success(employeeId, "Personel başarıyla eklendi.");
+            // Return the temporary password in the result message so the UI can show it to the admin
+            var message = $"Geçici şifre: {tempPassword}. Kullanıcı ilk girişte değiştirmelidir.";
+            return Result<int>.Success(employeeId, message);
+        }
+
+        private static string GenerateTemporaryPassword(int length = 10)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_";
+            var sb = new StringBuilder();
+            using var rng = RandomNumberGenerator.Create();
+            var buffer = new byte[4];
+            while (sb.Length < length)
+            {
+                rng.GetBytes(buffer);
+                var num = BitConverter.ToUInt32(buffer, 0);
+                var idx = (int)(num % (uint)chars.Length);
+                sb.Append(chars[idx]);
+            }
+            return sb.ToString();
+        }
+
+        private static string HashPassword(string password)
+        {
+            // Simple SHA256 hash (consider replacing with a stronger hashing strategy when implementing auth)
+            using var sha = SHA256.Create();
+            var bytes = Encoding.UTF8.GetBytes(password);
+            var hash = sha.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
         }
     }
 }

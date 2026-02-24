@@ -38,4 +38,17 @@ namespace HRSupport.UI.Models
         public int Type { get; set; }
         public string Description { get; set; } = string.Empty;
     }
+    public class UpdateLeaveRequestViewModel
+    {
+        public int Id { get; set; }
+        [Required]
+        public int EmployeeId { get; set; }
+        [Required]
+        public DateTime StartDate { get; set; }
+        [Required]
+        public DateTime EndDate { get; set; }
+        public int Type { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public int Status { get; set; } // Onay/Red durumunu değiştirebilmek için
+    }
 }

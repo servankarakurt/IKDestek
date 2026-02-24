@@ -20,6 +20,10 @@ namespace HRSupport.Domain.Entites
         public int? MentorId { get; set; }
         public Employee? Mentor { get; set; }
 
+        // Authentication-related fields for intern
+        public string PasswordHash { get; set; } = string.Empty;
+        public bool MustChangePassword { get; set; } = false;
+
         public string FullName => $"{FirstName} {LastName}";
     }
 }
