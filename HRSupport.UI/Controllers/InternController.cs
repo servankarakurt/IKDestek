@@ -137,5 +137,31 @@ namespace HRSupport.UI.Controllers
                 ViewBag.Mentors = new SelectList(Enumerable.Empty<EmployeeLookupViewModel>(), "Id", "FullName");
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> Print(int id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/LeaveRequest/{id}";
+
+            try
+            {
+                // İzin detaylarını API'den çekiyoruz
+                var response = await client.GetFromJsonAsync<ApiResult<LeaveRequestViewModel>>(apiUrl);
+
+                if (response != null && response.IsSuccess && response.Value != null)
+                {
+                    // Sadece Onaylanmış izinlerin yazdırılmasını güvenlik için kontrol edebilirsin
+                    // if(response.Value.Status != 3) return BadRequest("Sadece onaylanmış izinler yazdırılabilir.");
+
+                    return View(response.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+               // _logger.LogError($"Yazdırma için izin çekilirken hata: {ex.Message}");
+            }
+
+            return NotFound("İzin belgesi bulunamadı.");
+        }
     }
 }

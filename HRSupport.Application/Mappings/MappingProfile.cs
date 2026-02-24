@@ -29,7 +29,7 @@ namespace HRSupport.Application.Mappings
 
             // LeaveRequest -> LeaveRequestDto çevirisi (src.LeaveType yerine src.Type kullanıldı)
             CreateMap<LeaveRequest, LeaveRequestDto>()
-                .ForMember(dest => dest.LeaveType, opt => opt.MapFrom(src => src.Type.ToString()))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         }
     }

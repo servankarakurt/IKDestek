@@ -1,0 +1,133 @@
+﻿@model HRSupport.UI.Models.DashboardStatsViewModel
+@{
+    ViewData["Title"] = "İK Dashboard";
+}
+
+<div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Genel Durum Özeti (İK Paneli)</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Toplam Çalışan</h5>
+                    <h1 class="display-4 fw-bold">@Model.TotalEmployees</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-info shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Toplam Stajyer</h5>
+                    <h1 class="display-4 fw-bold">@Model.TotalInterns</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-warning shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Bekleyen İzinler</h5>
+                    <h1 class="display-4 fw-bold">@Model.PendingLeaveRequests</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Onaylanan İzinler</h5>
+                    <h1 class="display-4 fw-bold">@Model.ApprovedLeaveRequests</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Onay Bekleyen İzin Talepleri</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Personel No</th>
+                                <th>İzin Türü</th>
+                                <th>Başlangıç</th>
+                                <th>Bitiş</th>
+                                <th>Aksiyon</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.RecentPendingRequests != null && Model.RecentPendingRequests.Any())
+                            {
+                                foreach (var item in Model.RecentPendingRequests)
+                                {
+                                    // ALGORİTMA BURADA ÇALIŞIYOR: Eğer ekstrem durumsa (bakiyesi yok ama acilse) satırı KIRMIZI yap!
+                                    string rowClass = item.IsUrgentWithoutBalance ? "table-danger fw-bold" : "";
+
+                                    <tr class="@rowClass">
+                                        <td>@item.EmployeeId</td>
+                                        <td>
+                                            @item.Type
+                                            @if (item.IsUrgentWithoutBalance)
+                                            {
+                                                <span class="badge bg-danger ms-2">DİKKAT: Bakiye Yetersiz (Acil)</span>
+                                            }
+                                        </td>
+                                        <td>@item.StartDate.ToShortDateString()</td>
+                                        <td>@item.EndDate.ToShortDateString()</td>
+                                        <td>
+                                            <form asp-controller="Dashboard" asp-action="UpdateLeaveStatus" method="post" class="d-inline">
+                                                <input type="hidden" name="leaveRequestId" value="@item.Id" />
+                                                <input type="hidden" name="newStatus" value="3" />
+                                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Bu izni onaylamak istediğinize emin misiniz?');">Onayla</button>
+                                            </form>
+
+                                            <form asp-controller="Dashboard" asp-action="UpdateLeaveStatus" method="post" class="d-inline">
+                                                <input type="hidden" name="leaveRequestId" value="@item.Id" />
+                                                <input type="hidden" name="newStatus" value="2" />
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bu izni reddetmek istediğinize emin misiniz?');">Reddet</button>
+                                            </form>
+
+                                            <form asp-controller="Dashboard" asp-action="UpdateLeaveStatus" method="post" class="d-inline">
+                                                <input type="hidden" name="leaveRequestId" value="@item.Id" />
+                                                <input type="hidden" name="newStatus" value="4" />
+                                                <button type="submit" class="btn btn-sm btn-warning text-white" onclick="return confirm('Bu izin için revizyon (düzeltme) istemek istediğinize emin misiniz?');">Revizyon İste</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted p-3">Bekleyen izin talebi bulunmuyor.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

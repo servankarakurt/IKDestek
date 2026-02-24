@@ -1,5 +1,5 @@
-﻿using HRSupport.Domain.Common;
-using HRSupport.Domain.Entites;
+﻿using HRSupport.Domain.Entites;
+using HRSupport.Domain.Enum;
 
 namespace HRSupport.Application.Interfaces
 {

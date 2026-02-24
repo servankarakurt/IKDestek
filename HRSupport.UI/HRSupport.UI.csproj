@@ -12,8 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="image\" />
     <Folder Include="Views\Auth\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HRSupport.Application\HRSupport.Application.csproj" />
   </ItemGroup>
 
 </Project>

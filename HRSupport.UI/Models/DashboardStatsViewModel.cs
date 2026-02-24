@@ -1,4 +1,6 @@
-﻿namespace HRSupport.UI.Models
+﻿using HRSupport.Application.DTOs;
+
+namespace HRSupport.UI.Models
 {
     // API'den dönen ana veri
     public class DashboardStatsViewModel
@@ -7,6 +9,7 @@
         public int TotalInterns { get; set; }
         public int PendingLeaveRequests { get; set; }
         public int ApprovedLeaveRequests { get; set; }
+        public List<LeaveRequestDto> RecentPendingRequests { get; set; } = new List<LeaveRequestDto>();
     }
 
     // API'mizin Result<T> yapısını karşılamak için sarmalayıcı sınıf

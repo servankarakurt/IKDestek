@@ -8,6 +8,7 @@ namespace HRSupport.Domain.Enum
     {
         Beklemede = 1,
         Reddedildi = 2,
-        Onaylandı = 3
+        Onaylandı = 3,
+        RevizyonBekleniyor = 4
     }
 }

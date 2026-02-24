@@ -1,5 +1,5 @@
 ﻿using HRSupport.Application.Common;
-using HRSupport.Domain.Common;
+using HRSupport.Domain.Enum;
 using MediatR;
 using System;
 

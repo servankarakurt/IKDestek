@@ -15,8 +15,7 @@ namespace HRSupport.Infrastructure.Context
         public DbSet<Employee> Employees { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
         public DbSet<Intern> Interns { get; set; }
-        public DbSet<WeeklyReportRequest> WeeklyReportRequests { get; set; }
-
+        public DbSet<LeaveApprovalHistory> LeaveApprovalHistories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

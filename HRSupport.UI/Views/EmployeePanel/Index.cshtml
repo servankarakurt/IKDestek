@@ -1,0 +1,133 @@
+﻿@model HRSupport.UI.Models.EmployeeDashboardViewModel
+@{
+    ViewData["Title"] = "Çalışan Paneli";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Merhaba, Çalışan Panelinize Hoş Geldiniz! 👋</h2>
+        <a asp-controller="LeaveRequest" asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+            <i class="bi bi-calendar-plus"></i> Yeni İzin Talebi
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Kalan Yıllık İzniniz</h5>
+                    <h1 class="display-4 fw-bold">@Model.RemainingAnnualLeave <span class="fs-4 fw-normal">Gün</span></h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Onay Bekleyen Talepleriniz</h5>
+                    <h1 class="display-4 fw-bold">@Model.PendingRequestsCount</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Onaylanan Talepleriniz</h5>
+                    <h1 class="display-4 fw-bold">@Model.ApprovedRequestsCount</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">İzin Taleplerim</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>İzin Türü</th>
+                                <th>Başlangıç Tarihi</th>
+                                <th>Bitiş Tarihi</th>
+                                <th>Açıklama</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.MyLeaveRequests != null && Model.MyLeaveRequests.Any())
+                            {
+                                foreach (var item in Model.MyLeaveRequests.OrderByDescending(x => x.StartDate))
+                                {
+                                    <tr>
+                                        <td>
+                                            @* İzin Türü Enum ID'sini Metne Çeviriyoruz (1-Yıllık, 2-Hastalık, 5-Doğum vb.) *@
+                                            @if (item.Type == 1)
+                                            {
+                                                <span>Yıllık İzin</span>
+                                            }
+                                            else if (item.Type == 2)
+                                            {
+
+                                                <span>Hastalık İzni</span>
+                                            }
+                                            else if (item.Type == 3)
+                                            {
+
+                                                <span>Mazeret İzni</span>
+                                            }
+                                            else if (item.Type == 5)
+                                            {
+
+                                                <span>Doğum İzni</span>
+                                            }
+                                            else if (item.Type == 6)
+                                            {
+
+                                                <span>Ölüm İzni</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span>Diğer (@item.Type)</span>
+                                            }
+                                        </td>
+                                        <td>@item.StartDate.ToShortDateString()</td>
+                                        <td>@item.EndDate.ToShortDateString()</td>
+                                        <td>@item.Description</td>
+                                        <td>
+                                            @* Durum Enum ID'sine Göre Renkli Rozet (Badge) Gösterme *@
+                                            @if (item.Status == 1)
+                                            {
+                                                <span class="badge bg-warning text-dark">Beklemede</span>
+                                            }
+                                            else if (item.Status == 2)
+                                            {
+                                                <span class="badge bg-danger">Reddedildi</span>
+                                            }
+                                            else if (item.Status == 3)
+                                            {
+                                                <span class="badge bg-success">Onaylandı</span>
+                                            }
+                                            else if (item.Status == 4)
+                                            {
+                                                <span class="badge bg-info">Revizyon Bekliyor</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted p-3">Henüz bir izin talebiniz bulunmuyor.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

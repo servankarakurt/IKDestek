@@ -1,6 +1,6 @@
 ﻿using HRSupport.Application.Interfaces;
-using HRSupport.Domain.Common;
 using HRSupport.Domain.Entites;
+using HRSupport.Domain.Enum;
 using HRSupport.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 

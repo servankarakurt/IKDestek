@@ -19,7 +19,7 @@
                     <img src="/images/HR.jpg" alt="İK" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
                     <h4 class="fw-bold">İK Girişi</h4>
                     <p class="text-muted">Çalışan yönetimi, onaylar ve raporlar için İK paneline giriş yapın.</p>
-                    <a class="btn btn-primary mt-2 px-4" asp-controller="Auth" asp-action="Login" asp-route-role="HR">Giriş Yap</a>
+                    <a class="btn btn-primary mt-2 px-4" href="/Dashboard">Giriş Yap</a>
                 </div>
             </div>
 
@@ -28,7 +28,7 @@
                     <img src="~/images/Manager.jpg" alt="Yönetici" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
                     <h4 class="fw-bold">Yönetici Girişi</h4>
                     <p class="text-muted">Ekip yönetimi ve izin onay süreçleri için yönetici paneline giriş yapın.</p>
-                    <a class="btn btn-info mt-2 px-4 text-white" asp-controller="Auth" asp-action="Login" asp-route-role="Manager">Giriş Yap</a>
+                    <a class="btn btn-info mt-2 px-4 text-white" href="/Dashboard">Giriş Yap</a>
                 </div>
             </div>
 
@@ -37,7 +37,7 @@
                     <img src="~/images/Employee.jpg" alt="Çalışan" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
                     <h4 class="fw-bold">Çalışan Girişi</h4>
                     <p class="text-muted">Personelinizin kendi hesaplarına erişmesi ve taleplerini yönetmesi için giriş.</p>
-                    <a class="btn btn-success mt-2 px-4" asp-controller="Auth" asp-action="Login" asp-route-role="Employee">Giriş Yap</a>
+                    <a class="btn btn-success mt-2 px-4" href="/EmployeePanel">Giriş Yap</a>
                 </div>
             </div>
 
@@ -46,7 +46,7 @@
                     <img src="~/images/Intern.jpg" alt="Stajyer" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
                     <h4 class="fw-bold">Stajyer Girişi</h4>
                     <p class="text-muted">Stajyerlerin başvuruları ve görevleri için özel erişim.</p>
-                    <a class="btn btn-warning mt-2 px-4 text-white" asp-controller="Auth" asp-action="Login" asp-route-role="Intern">Giriş Yap</a>
+                    <a class="btn btn-warning mt-2 px-4 text-white" href="/EmployeePanel">Giriş Yap</a>
                 </div>
             </div>
         </div>
