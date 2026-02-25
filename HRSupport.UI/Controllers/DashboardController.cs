@@ -1,4 +1,4 @@
-﻿using HRSupport.Domain.Enum;
+using HRSupport.Domain.Enum;
 using HRSupport.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +18,7 @@ namespace HRSupport.UI.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Dashboard/stats";
 
             try
@@ -40,7 +40,7 @@ namespace HRSupport.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateLeaveStatus(int leaveRequestId, LeaveStatus newStatus, string? rejectReason)
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/UpdateStatus";
 
             // API'nin beklediği "UpdateLeaveRequestStatusCommand" modeline uygun anonim bir nesne oluşturuyoruz.

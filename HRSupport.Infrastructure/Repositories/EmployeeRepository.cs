@@ -1,5 +1,5 @@
-﻿using HRSupport.Application.Interfaces;
-using HRSupport.Domain.Entites;
+using HRSupport.Application.Interfaces;
+using HRSupport.Domain.Entities;
 using HRSupport.Domain.Enum;
 using HRSupport.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +27,9 @@ namespace HRSupport.Infrastructure.Repositories
 
         public async Task<Employee?> GetByEmailAsync(string email)
         {
-            return await _context.Employees.FirstOrDefaultAsync(x => x.Email == email);
+            if (string.IsNullOrWhiteSpace(email)) return null;
+            var normalized = email.Trim().ToLowerInvariant();
+            return await _context.Employees.FirstOrDefaultAsync(x => x.Email != null && x.Email.Trim().ToLower() == normalized);
         }
 
         public async Task<IEnumerable<Employee>> GetByDepartmentAsync(Department department)

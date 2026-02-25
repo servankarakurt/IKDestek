@@ -1,12 +1,19 @@
+using HRSupport.UI.Filters;
+using HRSupport.UI.Handlers;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// MVC Controller ve View'ları ekle
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<RequireLoginFilter>();
+});
+builder.Services.AddHttpContextAccessor();
 
-// API ile konuşmak için HttpClient'ı aktif et
 builder.Services.AddHttpClient();
+builder.Services.AddTransient<BearerTokenHandler>();
+builder.Services.AddHttpClient("ApiWithAuth")
+    .AddHttpMessageHandler<BearerTokenHandler>();
 
-// Session desteği
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(60);

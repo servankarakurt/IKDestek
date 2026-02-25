@@ -1,6 +1,7 @@
-﻿using HRSupport.Application.Features.Employees.Commans; // Doğru namespace eklendi
-using HRSupport.Application.Features.Employees.Queries;
+using HRSupport.Application.Features.LeaveRequests.Commands;
+using HRSupport.Application.Features.LeaveRequests.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -8,6 +9,7 @@ namespace HRSupport.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class LeaveRequestController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -18,29 +20,45 @@ namespace HRSupport.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateLeaveRequest(CreateLeaveRequestCommand command)
+        public async Task<IActionResult> CreateLeaveRequest([FromBody] CreateLeaveRequestCommand command)
         {
             var result = await _mediator.Send(command);
-            if (result.IsSuccess) return Ok(result);
-            return BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
+
         [HttpPut("UpdateStatus")]
         public async Task<IActionResult> UpdateStatus([FromBody] UpdateLeaveRequestStatusCommand command)
         {
             var result = await _mediator.Send(command);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
-        [HttpGet("GetAll")]
+
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var result = await _mediator.Send(new GetAllLeaveRequestsQuery());
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
 
-            if (result.IsSuccess)
-            {
-                return Ok(result);
-            }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _mediator.Send(new GetLeaveRequestByIdQuery(id));
+            return result.IsSuccess ? Ok(result) : NotFound(result);
+        }
 
-            return BadRequest(result);
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] UpdateLeaveRequestCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
+
+        [HttpGet("my-balance")]
+        public async Task<IActionResult> GetMyLeaveBalance()
+        {
+            var result = await _mediator.Send(new GetMyLeaveBalanceQuery());
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
     }
 }

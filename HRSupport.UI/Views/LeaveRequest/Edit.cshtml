@@ -1,4 +1,4 @@
-﻿@model HRSupport.UI.Models.UpdateLeaveRequestViewModel
+@model HRSupport.UI.Models.UpdateLeaveRequestViewModel
 @{
     ViewData["Title"] = "İzin Talebi Düzenle";
 }
@@ -35,9 +35,18 @@
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <select asp-for="Type" class="form-select rounded-3">
-                                        <option value="1">Yıllık İzin</option>
-                                        <option value="2">Hastalık İzni</option>
-                                        <option value="3">Mazeret İzni</option>
+                                        <option value="1">Yıllık</option>
+                                        <option value="2">Hastalık</option>
+                                        <option value="3">Mazeret</option>
+                                        <option value="4">Ücretsiz</option>
+                                        <option value="5">Doğum</option>
+                                        <option value="6">Ölüm</option>
+                                        <option value="7">Babalık</option>
+                                        <option value="8">Çocuğun Evlenmesi</option>
+                                        <option value="9">Evlilik</option>
+                                        <option value="10">Refakatçi</option>
+                                        <option value="11">Ek Mazeret</option>
+                                        <option value="12">Taşınma</option>
                                     </select>
                                     <label asp-for="Type">İzin Türü</label>
                                 </div>
@@ -46,8 +55,9 @@
                                 <div class="form-floating">
                                     <select asp-for="Status" class="form-select rounded-3">
                                         <option value="1">Beklemede</option>
-                                        <option value="2">Onaylandı</option>
-                                        <option value="3">Reddedildi</option>
+                                        <option value="2">Reddedildi</option>
+                                        <option value="3">Onaylandı</option>
+                                        <option value="4">Revizyon Bekleniyor</option>
                                     </select>
                                     <label asp-for="Status">Durum</label>
                                 </div>
@@ -61,6 +71,7 @@
 
                         <div class="d-flex justify-content-end gap-3 mt-4">
                             <a asp-action="Index" class="btn btn-light border-secondary px-4 py-2 rounded-3 shadow-sm fw-bold">İptal</a>
+                            <a asp-action="Print" asp-route-id="@Model.Id" class="btn btn-outline-secondary px-4 py-2 rounded-3 shadow-sm fw-bold" target="_blank"><i class="bi bi-printer me-1"></i>Yazdır</a>
                             <button type="submit" class="btn btn-warning px-5 py-2 rounded-3 shadow fw-bold">Güncelle</button>
                         </div>
                     </form>

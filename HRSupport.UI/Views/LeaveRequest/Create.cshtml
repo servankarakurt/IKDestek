@@ -1,4 +1,4 @@
-﻿@model HRSupport.UI.Models.CreateLeaveRequestViewModel
+@model HRSupport.UI.Models.CreateLeaveRequestViewModel
 
 @{
     ViewData["Title"] = "İzin Talebi Oluştur";
@@ -33,10 +33,18 @@
                         <div class="form-floating mb-4">
                             <select asp-for="Type" class="form-select rounded-3" required>
                                 <option value="">İzin Türünü Seçiniz...</option>
-                                <option value="1">Yıllık İzin</option>
-                                <option value="2">Mazeret İzni</option>
-                                <option value="3">Hastalık / Rapor</option>
-                                <option value="4">Ücretsiz İzin</option>
+                                <option value="1">Yıllık</option>
+                                <option value="2">Hastalık</option>
+                                <option value="3">Mazeret</option>
+                                <option value="4">Ücretsiz</option>
+                                <option value="5">Doğum</option>
+                                <option value="6">Ölüm</option>
+                                <option value="7">Babalık</option>
+                                <option value="8">Çocuğun Evlenmesi</option>
+                                <option value="9">Evlilik</option>
+                                <option value="10">Refakatçi</option>
+                                <option value="11">Ek Mazeret</option>
+                                <option value="12">Taşınma</option>
                             </select>
                             <label asp-for="Type">İzin Türü</label>
                         </div>

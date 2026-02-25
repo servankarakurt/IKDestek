@@ -1,27 +1,22 @@
-﻿@model HRSupport.UI.Models.LeaveRequestViewModel
+@model HRSupport.UI.Models.LeaveRequestPrintViewModel
 @{
-    // Menü, sidebar gibi şeylerin bu sayfada görünmemesi için Layout'u iptal ediyoruz.
     Layout = null;
-
-    // Yardımcı değişkenler (Gün hesabı ve dönüş tarihi için)
-    int days = (Model.EndDate - Model.StartDate).Days + 1;
-    DateTime returnDate = Model.EndDate.AddDays(1);
+    var returnDate = Model.EndDate.AddDays(1); /* İzinden dönüş = işe dönüş tarihi */
 }
-
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=Windows-1254">
-    <title>İzin Formu Yazdır - @Model.EmployeeName</title>
+    <title>Yıllık Ücretli İzin Formu - @Model.EmployeeName</title>
     <style type="text/css" media="print">
         .NonPrintable {
-            display: none; /* Yazdırılırken buton görünmesin */
+            display: none;
         }
     </style>
 </head>
-<body onload="window.print()">
+<body>
 
-    <div align="center" style="padding-bottom: 20px; padding-top: 20px;">
+    <div align="center" style="padding-bottom: 20px;">
         <table width="662" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff;font-size:12px;font-family:arial;">
             <tbody>
                 <tr align="left" valign="top">
@@ -29,11 +24,9 @@
                         <table width="662" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff;font-size:12px;font-family:arial;">
                             <tbody>
                                 <tr align="left" valign="top">
-                                    <td width="240">
-                                        <img src="/images/HR.jpg" style="height:60px; object-fit:contain;" alt="Logo" />
-                                    </td>
-                                    <td style="padding:2px; font-size:16px;"><strong>YILLIK ÜCRETLİ İZİN FORMU </strong></td>
-                                    <td valign="bottom" align="right">Tarihi: @DateTime.Now.ToShortDateString()</td>
+                                    <td width="240"><img src="https://www.mydmg.com/logolar/doganlogo.gif" alt="Logo" /></td>
+                                    <td style="padding:2px"><strong>YILLIK ÜCRETLİ İZİN FORMU </strong></td>
+                                    <td valign="bottom" align="right">Tarihi: @Model.FormPrintDate.ToString("dd.MM.yyyy")</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -50,35 +43,40 @@
                 <tr align="left" valign="top">
                     <td style="padding:2px">Adı Soyadı</td>
                     <td style="padding:2px">:</td>
-                    <td style="padding:2px; font-weight:bold;">@Model.EmployeeName</td>
+                    <td style="padding:2px">@Model.EmployeeName</td>
                 </tr>
                 <tr align="left" valign="top">
                     <td style="padding:2px">Kurumu</td>
                     <td style="padding:2px">:</td>
-                    <td style="padding:2px">Hepiyi Sigorta</td>
+                    <td style="padding:2px">@Model.Kurum</td>
                 </tr>
                 <tr align="left" valign="top">
                     <td style="padding:2px">Şirketi</td>
                     <td style="padding:2px">:</td>
-                    <td style="padding:2px">Hepiyi Sigorta A.Ş.</td>
+                    <td style="padding:2px">@Model.Sirket</td>
                 </tr>
                 <tr align="left" valign="top">
                     <td style="padding:2px">Grup / Bölümü</td>
                     <td style="padding:2px">:</td>
-                    <td style="padding:2px">Belirtilmedi</td>
+                    <td style="padding:2px">@(string.IsNullOrEmpty(Model.DepartmentName) ? "" : Model.DepartmentName)</td>
                 </tr>
                 <tr align="left" valign="top">
-                    <td style="padding:2px">Sicil No / ID</td>
+                    <td style="padding:2px">Unvanı</td>
                     <td style="padding:2px">:</td>
-                    <td style="padding:2px">@Model.EmployeeId</td>
+                    <td style="padding:2px">@Model.Unvan</td>
+                </tr>
+                <tr align="left" valign="top">
+                    <td style="padding:2px">Sicil No</td>
+                    <td style="padding:2px">:</td>
+                    <td style="padding:2px">@Model.SicilNo</td>
                 </tr>
                 <tr align="left" valign="top">
                     <td colspan="3" style="border: 1px solid #000000; background:#010ca8;padding:2px;"><span style="color:#ffffff;">İzin Talebi :</span></td>
                 </tr>
                 <tr align="left" valign="top">
                     <td style="height:102px;padding:2px" colspan="3">
-                        <br><b>@Model.StartDate.Year</b> yılına ait yıllık ücretli iznimi <b>@Model.StartDate.ToShortDateString()</b> - <b>@Model.EndDate.ToShortDateString()</b> tarihleri arasında <b>@days</b> gün kullanmayı talep etmekteyim.<br><br>
-                        İznini geçireceği adres  ve telefon no: @Model.Description <br />
+                        <br>@Model.LeaveYear yılına ait yıllık ücretli iznimi @Model.StartDate.ToString("dd.MM.yyyy") - @Model.EndDate.ToString("dd.MM.yyyy") tarihleri arasında @Model.RequestedDays gün kullanmayı talep etmekteyim.<br><br>
+                        İznini geçireceği adres ve telefon no: @(string.IsNullOrEmpty(Model.AddressAndPhone) ? "..." : Model.AddressAndPhone)
                         <div style="text-align:right">İmza&nbsp;</div>
                     </td>
                 </tr>
@@ -87,11 +85,9 @@
                 </tr>
                 <tr align="left" valign="top">
                     <td style="height:102px;padding:2px" colspan="3">
-                        İnsan Kaynakları Müdürlüğü’ne,<br>
+                        İnsan Kaynakları Müdürlüğü'ne,<br>
                         Adı geçen personelin yıllık ücretli iznini belirtilen tarihler arasında kullanması uygun görülmüştür.
-                        <div style="text-align:right">
-                            <br>İmza&nbsp;<br><br>
-                        </div>
+                        <div style="text-align:right"><br>Adı Soyadı&nbsp;<br>(Onaylayan Yönetici ad soyad)<br><br>İmza&nbsp;<br><br></div>
                     </td>
                 </tr>
                 <tr align="left" valign="top">
@@ -104,16 +100,20 @@
                             <tbody>
                                 <tr align="left" valign="top">
                                     <td style="padding:2px">Gruba giriş tarihi:</td>
-                                    <td style="width:45%">--</td>
+                                    <td style="width:45%">@Model.EmployeeStartDate.ToString("dd.MM.yyyy")</td>
                                     <td style="padding:2px">Şirkete giriş tarihi:</td>
-                                    <td style="padding:2px">--</td>
+                                    <td style="padding:2px">@Model.EmployeeStartDate.ToString("dd.MM.yyyy")</td>
+                                </tr>
+                                <tr align="left" valign="top">
+                                    <td style="padding:2px">İzni hakediş tarihi:</td>
+                                    <td style="width:45%"></td>
+                                    <td style="padding:2px">@Model.LeaveYear yılı yıllık izin süresi :</td>
+                                    <td style="padding:2px"></td>
                                 </tr>
                                 <tr align="left" valign="top">
                                     <td style="padding:2px">Statü:</td>
                                     <td style="width:45%">4857 sayılı yasaya tabi</td>
-                                    <td colspan="2">
-                                        <div style="text-align:right"><br>Adı Soyadı&nbsp;<br><br>Kontrol / Onay  (imza)&nbsp;</div>
-                                    </td>
+                                    <td colspan="2"><div style="text-align:right"><br>Adı Soyadı&nbsp;<br><br>Kontrol / Onay  (imza)&nbsp;</div></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -124,24 +124,24 @@
                 </tr>
                 <tr align="left" valign="top">
                     <td style="height:162px;padding:2px" colspan="3">
-                        <br>İnsan Kaynakları Müdürlüğü’ne,<br>
-                        @Model.StartDate.Year yılına ait, yıllık ücretli iznimi aşağıda belirtilen tarihler arasında kullandım. Bu süreye ait ücretimi işyerinden aldım.
-                        <br><br />
+                        <br>İnsan Kaynakları Müdürlüğü'ne,<br>
+                        @Model.LeaveYear yılına ait, yıllık ücretli iznimi aşağıda belirtilen tarihler arasında kullandım. Bu süreye ait ücretimi işyerinden aldım.
+                        <br><br>
                         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff;font-size:12px;font-family:arial;">
                             <tbody>
                                 <tr align="left" valign="top">
                                     <td style="padding:2px">İzne çıkış tarihi:</td>
-                                    <td style="width:45%; font-weight:bold;">@Model.StartDate.ToShortDateString()</td>
+                                    <td style="width:45%">@Model.StartDate.ToString("dd.MM.yyyy")</td>
                                     <td style="text-align:right"><br>Adı Soyadı&nbsp;<br>@Model.EmployeeName</td>
                                 </tr>
                                 <tr align="left" valign="top">
                                     <td style="padding:2px">İzinden dönüş tarihi:</td>
-                                    <td style="padding:2px; font-weight:bold;">@returnDate.ToShortDateString()</td>
+                                    <td style="padding:2px">@returnDate.ToString("dd.MM.yyyy")</td>
                                     <td style="text-align:right"><br>İmza&nbsp;</td>
                                 </tr>
                                 <tr align="left" valign="top">
                                     <td style="padding:2px">Kullanılan izin günü:</td>
-                                    <td style="padding:2px; font-weight:bold;">@days</td>
+                                    <td style="padding:2px">@Model.KullanilanIzinGunuDisplay</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -151,24 +151,23 @@
                     <td colspan="3" style="background:#000000;height:1px;"></td>
                 </tr>
                 <tr align="left" valign="top">
-                    <td colspan="3" style="padding:2px">İnsan Kaynakları Platformu, ”İzin Yönetimi” bölümünde izin bilgileri kayıt edildikten sonra, personelin sicil dosyasında muhafaza edilecektir.<br></td>
+                    <td colspan="3" style="padding:2px">İnsan Kaynakları Platformu, "İzin Yönetimi" bölümünde izin bilgileri kayıt edildikten sonra, personelin sicil dosyasında muhafaza edilecektir.<br></td>
                 </tr>
                 <tr align="left" valign="top">
                     <td colspan="3" style="border: 1px solid #000000;"></td>
                 </tr>
                 <tr align="left" valign="top">
-                    <td colspan="5">
-                        <div style="float:left;">Bu form İK Destek sistemi üzerinden yazdırılmıştır.</div>
-                        <div style="float:right;">Personel Yönetmeliği / Ek-3</div> <br><br>
-                    </td>
+                    <td colspan="5"><div style="float:left;">Bu form e-çalışan üzerinden yazdırılmıştır.</div><div style="float:right;">Personel Yönetmeliği / Ek-3</div> <br><br></td>
                 </tr>
             </tbody>
         </table>
     </div>
 
+    <br><br>
     <div align="center">
-        <button class="NonPrintable" style="width:150px;height:45px; background-color:#010ca8; color:white; border-radius:5px; border:none; cursor:pointer;" onclick="window.print()">Yazdır / PDF Kaydet</button>
+        <input type="button" class="NonPrintable" style="width:120px;height:40px;" value="Yazdır" onclick="window.print()">
     </div>
+    <br><br>
 
 </body>
 </html>

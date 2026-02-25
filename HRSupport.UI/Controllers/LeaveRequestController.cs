@@ -21,9 +21,9 @@ namespace HRSupport.UI.Controllers
         {
             try
             {
-                var client = _httpClientFactory.CreateClient();
+                var client = _httpClientFactory.CreateClient("ApiWithAuth");
 
-                var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/GetAll";
+                var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/LeaveRequest";
                 _logger.LogInformation($"API çağrısı: {apiUrl}");
 
                 var response = await client.GetFromJsonAsync<ApiResult<List<LeaveRequestViewModel>>>(apiUrl);
@@ -54,7 +54,7 @@ namespace HRSupport.UI.Controllers
 
             try
             {
-                var client = _httpClientFactory.CreateClient();
+                var client = _httpClientFactory.CreateClient("ApiWithAuth");
 
                 var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest";
                 var response = await client.PostAsJsonAsync(apiUrl, model);
@@ -74,7 +74,7 @@ namespace HRSupport.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/LeaveRequest/{id}";
 
             var response = await client.GetFromJsonAsync<ApiResult<UpdateLeaveRequestViewModel>>(apiUrl);
@@ -95,7 +95,7 @@ namespace HRSupport.UI.Controllers
 
             if (!ModelState.IsValid) return View(model);
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/update";
 
             try
@@ -113,6 +113,80 @@ namespace HRSupport.UI.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyBalance()
+        {
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/LeaveRequest/my-balance";
+            try
+            {
+                var response = await client.GetFromJsonAsync<ApiResult<int>>(apiUrl);
+                var days = (response?.IsSuccess == true && response.Value >= 0) ? response.Value : 0;
+                return View(days);
+            }
+            catch
+            {
+                return View(0);
+            }
+        }
+
+        /// <summary>
+        /// İzin talebi için yıllık ücretli izin formu yazdırma sayfası.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> Print(int id)
+        {
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
+            var baseUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/');
+
+            var leaveResponse = await client.GetFromJsonAsync<ApiResult<UpdateLeaveRequestViewModel>>(baseUrl + $"/api/LeaveRequest/{id}");
+            if (leaveResponse == null || !leaveResponse.IsSuccess || leaveResponse.Value == null)
+                return NotFound("İzin talebi bulunamadı.");
+
+            var leave = leaveResponse.Value;
+            var empResponse = await client.GetFromJsonAsync<ApiResult<UpdateEmployeeViewModel>>(baseUrl + $"/api/Employee/{leave.EmployeeId}");
+            if (empResponse == null || !empResponse.IsSuccess || empResponse.Value == null)
+                return NotFound("Çalışan bilgisi bulunamadı.");
+
+            var emp = empResponse.Value;
+            var days = (leave.EndDate - leave.StartDate).Days + 1;
+
+            var printModel = new LeaveRequestPrintViewModel
+            {
+                FormPrintDate = DateTime.Now,
+                EmployeeName = $"{emp.FirstName} {emp.LastName}".Trim(),
+                Kurum = "Hepiyi Sigorta",
+                Sirket = "Hepiyi Sigorta A.Ş.",
+                DepartmentName = GetDepartmentName(emp.Department),
+                Unvan = "",
+                SicilNo = emp.CardID,
+                LeaveYear = leave.StartDate.Year,
+                StartDate = leave.StartDate,
+                EndDate = leave.EndDate,
+                RequestedDays = days,
+                AddressAndPhone = leave.Description ?? "",
+                EmployeeStartDate = emp.StartDate,
+                KullanilanIzinGunuDisplay = days.ToString(System.Globalization.CultureInfo.GetCultureInfo("tr-TR"))
+            };
+
+            return View(printModel);
+        }
+
+        private static string GetDepartmentName(int department)
+        {
+            return department switch
+            {
+                1 => "Yazılım",
+                2 => "İnsan Kaynakları",
+                3 => "Satış",
+                4 => "Muhasebe",
+                5 => "Pazarlama",
+                6 => "Operasyon",
+                7 => "Acente",
+                _ => ""
+            };
         }
     }
 }

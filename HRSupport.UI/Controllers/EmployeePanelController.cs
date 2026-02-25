@@ -1,4 +1,4 @@
-﻿using HRSupport.UI.Models;
+using HRSupport.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRSupport.UI.Controllers
@@ -16,12 +16,10 @@ namespace HRSupport.UI.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // NOT: Auth sistemi kurulduğunda buradaki ID'yi sisteme giren kişiden alacağız.
-            // Örn: var currentEmployeeId = int.Parse(User.FindFirst("Id").Value);
-            int currentEmployeeId = 1; // Şimdilik test için Sabit 1 numaralı çalışanı kullanıyoruz.
+            var currentEmployeeId = HttpContext.Session.GetInt32("UserId") ?? 0;
 
-            var client = _httpClientFactory.CreateClient();
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/LeaveRequest/GetAll";
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/LeaveRequest";
 
             var model = new EmployeeDashboardViewModel();
 
@@ -31,8 +29,10 @@ namespace HRSupport.UI.Controllers
 
                 if (response != null && response.IsSuccess && response.Value != null)
                 {
-                    // Sadece sisteme giren çalışanın (ID=1) izinlerini filtrele
-                    var myRequests = response.Value.Where(x => x.EmployeeId == currentEmployeeId).ToList();
+                    // API rol bazlı zaten kendi taleplerini döndürüyor; yine de ID ile filtreleyebiliriz
+                    var myRequests = currentEmployeeId > 0
+                        ? response.Value.Where(x => x.EmployeeId == currentEmployeeId).ToList()
+                        : response.Value;
 
                     model.MyLeaveRequests = myRequests;
                     model.PendingRequestsCount = myRequests.Count(x => x.Status == 1); // 1: Beklemede

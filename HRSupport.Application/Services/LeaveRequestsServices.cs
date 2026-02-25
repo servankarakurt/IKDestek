@@ -1,4 +1,4 @@
-﻿using HRSupport.Domain.Entites;
+using HRSupport.Domain.Entities;
 using HRSupport.Domain.Enum;
 using System;
 

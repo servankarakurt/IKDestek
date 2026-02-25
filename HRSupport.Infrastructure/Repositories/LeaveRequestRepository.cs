@@ -1,5 +1,5 @@
-﻿using HRSupport.Application.Interfaces;
-using HRSupport.Domain.Entites;
+using HRSupport.Application.Interfaces;
+using HRSupport.Domain.Entities;
 using HRSupport.Domain.Enum; // LeaveStatus için
 using HRSupport.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +52,15 @@ namespace HRSupport.Infrastructure.Repositories
         {
             return await _context.LeaveRequests
                 .Where(x => x.EmployeeId == employeeId)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<LeaveRequest>> GetByEmployeeIdsAsync(IEnumerable<int> employeeIds)
+        {
+            var idList = employeeIds.ToList();
+            if (idList.Count == 0) return new List<LeaveRequest>();
+            return await _context.LeaveRequests
+                .Where(x => idList.Contains(x.EmployeeId))
                 .ToListAsync();
         }
     }

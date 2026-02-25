@@ -1,5 +1,5 @@
-﻿using HRSupport.Application.Interfaces;
-using HRSupport.Domain.Entites;
+using HRSupport.Application.Interfaces;
+using HRSupport.Domain.Entities;
 using HRSupport.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -21,9 +21,17 @@ namespace HRSupport.Infrastructure.Repositories
             return await _context.Interns.Include(i => i.Mentor).ToListAsync();
         }
 
-        public async Task<Intern> GetByIdAsync(int id)
+        public async Task<Intern?> GetByIdAsync(int id)
         {
             return await _context.Interns.Include(i => i.Mentor).FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<Intern?> GetByEmailAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return null;
+            var normalized = email.Trim().ToLowerInvariant();
+            return await _context.Interns.Include(i => i.Mentor)
+                .FirstOrDefaultAsync(x => x.Email != null && x.Email.Trim().ToLower() == normalized);
         }
 
         public async Task<int> AddAsync(Intern entity)
@@ -40,7 +48,7 @@ namespace HRSupport.Infrastructure.Repositories
             return intern;
         }
 
-        public async Task<Intern> DeleteAsync(int id)
+        public async Task<Intern?> DeleteAsync(int id)
         {
             var intern = await _context.Interns.FirstOrDefaultAsync(x => x.Id == id);
             if (intern != null)

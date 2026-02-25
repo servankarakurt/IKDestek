@@ -1,0 +1,47 @@
+@model HRSupport.UI.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Giriş Yap";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HRSupport</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <style>
+        body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); }
+        .login-card { max-width: 400px; border-radius: 1rem; box-shadow: 0 1rem 3rem rgba(0,0,0,.2); }
+        .btn-primary { background: linear-gradient(135deg, #1e3a5f, #2d5a87); border: none; }
+    </style>
+</head>
+<body>
+    <div class="card login-card">
+        <div class="card-header bg-dark text-white text-center py-4 rounded-top">
+            <h4 class="mb-0"><i class="bi bi-shield-lock me-2"></i>HRSupport</h4>
+            <small>E-posta ve şifre ile giriş yapın</small>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Login" asp-controller="Auth" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">E-posta</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="ornek@sirket.com" autofocus />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Password" class="form-label">Şifre</label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="••••••••" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2"><i class="bi bi-box-arrow-in-right me-2"></i>Giriş Yap</button>
+            </form>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+</body>
+</html>

@@ -1,9 +1,13 @@
-﻿namespace HRSupport.UI.Models
+namespace HRSupport.UI.Models
 {
-    // API'den Result.Value içinden dönen asıl veri
     public class LoginResponseModel
     {
-        public string Token { get; set; } // Hata veren yer burasıydı, eklendi!
-        public string Email { get; set; }
+        public string Token { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public int UserId { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string UserType { get; set; } = string.Empty;
+        public bool MustChangePassword { get; set; }
     }
 }

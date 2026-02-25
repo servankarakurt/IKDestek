@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace HRSupport.UI.Models
 {
@@ -50,5 +50,27 @@ namespace HRSupport.UI.Models
         public int Type { get; set; }
         public string Description { get; set; } = string.Empty;
         public int Status { get; set; } // Onay/Red durumunu değiştirebilmek için
+    }
+
+    /// <summary>
+    /// İzin formu yazdırma sayfası için model (Yıllık Ücretli İzin Formu).
+    /// </summary>
+    public class LeaveRequestPrintViewModel
+    {
+        public DateTime FormPrintDate { get; set; }
+        public string EmployeeName { get; set; } = string.Empty;
+        public string Kurum { get; set; } = "Hepiyi Sigorta";
+        public string Sirket { get; set; } = "Hepiyi Sigorta A.Ş.";
+        public string DepartmentName { get; set; } = string.Empty;
+        public string Unvan { get; set; } = string.Empty;
+        public int SicilNo { get; set; }
+        public int LeaveYear { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int RequestedDays { get; set; }
+        /// <summary>Adres ve telefon (açıklama alanı veya ayrı bilgi).</summary>
+        public string AddressAndPhone { get; set; } = string.Empty;
+        public DateTime EmployeeStartDate { get; set; }
+        public string KullanilanIzinGunuDisplay { get; set; } = string.Empty; // "1,5" veya "3" gibi
     }
 }

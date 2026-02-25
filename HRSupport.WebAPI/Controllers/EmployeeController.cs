@@ -1,6 +1,7 @@
-﻿using HRSupport.Application.Features.Employees.Commans;
+using HRSupport.Application.Features.Employees.Commands;
 using HRSupport.Application.Features.Employees.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +9,7 @@ namespace HRSupport.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -25,7 +27,7 @@ namespace HRSupport.WebAPI.Controllers
             try
             {
                 var result = await _mediator.Send(new GetAllEmployeesQuery());
-                return Ok(result);
+                return result.IsSuccess ? Ok(result) : BadRequest(result);
             }
             catch (Exception ex)
             {
@@ -39,7 +41,7 @@ namespace HRSupport.WebAPI.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _mediator.Send(new GetEmployeeByIdQuery(id));
-            return Ok(result);
+            return result.IsSuccess ? Ok(result) : NotFound(result);
         }
 
         [HttpPost("create")]
@@ -71,14 +73,14 @@ namespace HRSupport.WebAPI.Controllers
         public async Task<IActionResult> Update([FromBody] UpdateEmployeeCommand command)
         {
             var result = await _mediator.Send(command);
-            return Ok(result);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteEmployeeCommand(id));
-            return Ok(result);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace HRSupport.UI.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Dashboard/stats";
 
             try

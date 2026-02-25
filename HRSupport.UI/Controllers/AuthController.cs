@@ -1,34 +1,69 @@
+using HRSupport.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRSupport.UI.Controllers
 {
     public class AuthController : Controller
     {
-        [HttpGet]
-        public IActionResult Login(string role)
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
+
+        public AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
-            if (string.IsNullOrWhiteSpace(role))
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
+        }
+
+        [HttpGet]
+        public IActionResult Login(string? returnUrl = null)
+        {
+            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+                return RedirectToAction("Index", "Home");
+            ViewData["ReturnUrl"] = returnUrl;
+            return View(new LoginViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/Auth/login";
+            var client = _httpClientFactory.CreateClient();
+            var response = await client.PostAsJsonAsync(apiUrl, new { model.Email, model.Password });
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = System.Text.Json.JsonSerializer.Deserialize<ApiResult<LoginResponseModel>>(json,
+                new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (response.IsSuccessStatusCode && result?.IsSuccess == true && result.Value != null)
             {
+                var data = result.Value;
+                HttpContext.Session.SetString("Token", data.Token);
+                HttpContext.Session.SetString("Email", data.Email);
+                HttpContext.Session.SetString("Role", data.Role);
+                HttpContext.Session.SetInt32("UserId", data.UserId);
+                HttpContext.Session.SetString("FullName", data.FullName ?? "");
+                HttpContext.Session.SetString("UserType", data.UserType ?? "");
+
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                    return Redirect(returnUrl);
                 return RedirectToAction("Index", "Home");
             }
 
-            // Basit rol seçimi – gerçek kimlik doğrulama ileride eklenebilir
-            HttpContext.Session.SetString("Role", role);
-
-            return role switch
-            {
-                "HR" => RedirectToAction("Index", "Home"),
-                "Manager" => RedirectToAction("Index", "LeaveRequest"),
-                "Employee" => RedirectToAction("Index", "LeaveRequest"),
-                "Intern" => RedirectToAction("Index", "LeaveRequest"),
-                _ => RedirectToAction("Index", "Home")
-            };
+            ModelState.AddModelError("", result?.Error ?? "Giriş başarısız. E-posta veya şifreyi kontrol edin.");
+            return View(model);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login");
         }
     }
 }

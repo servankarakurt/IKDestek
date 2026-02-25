@@ -1,7 +1,7 @@
-﻿using HRSupport.Application.Common;
+using HRSupport.Application.Common;
 using HRSupport.Application.DTOs;
 using HRSupport.Application.Interfaces;
-using HRSupport.Domain.Entites;
+using HRSupport.Domain.Entities;
 using HRSupport.Domain.Enum;
 using MediatR;
 using System.Linq; // .Where ve .Select kullanabilmek için gerekli

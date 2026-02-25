@@ -1,7 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using HRSupport.Application.Common;
 using HRSupport.Application.DTOs;
 using HRSupport.Application.Interfaces;
+using HRSupport.Domain.Enum;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading;
@@ -13,20 +14,28 @@ namespace HRSupport.Application.Features.Employees.Queries
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUser;
 
-        public GetAllEmployeesHandler(IEmployeeRepository employeeRepository, IMapper mapper)
+        public GetAllEmployeesHandler(IEmployeeRepository employeeRepository, IMapper mapper, ICurrentUserService currentUser)
         {
             _employeeRepository = employeeRepository;
             _mapper = mapper;
+            _currentUser = currentUser;
         }
 
         public async Task<Result<IEnumerable<EmployeeDto>>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
         {
-            var employees = await _employeeRepository.GetAllEmployeesAsync();
+            IEnumerable<Domain.Entities.Employee> employees;
+            var role = _currentUser.Role ?? "";
 
-            // Veritabanından gelen Entity listesini, DTO listesine dönüştürüyoruz
+            if (role == "Admin" || role == "IK")
+                employees = await _employeeRepository.GetAllEmployeesAsync();
+            else if (role == "Yönetici" && _currentUser.DepartmentId.HasValue)
+                employees = await _employeeRepository.GetByDepartmentAsync((Department)_currentUser.DepartmentId.Value);
+            else
+                employees = new List<Domain.Entities.Employee>();
+
             var employeeDtos = _mapper.Map<IEnumerable<EmployeeDto>>(employees);
-
             return Result<IEnumerable<EmployeeDto>>.Success(employeeDtos, "Çalışan listesi başarıyla getirildi.");
         }
     }

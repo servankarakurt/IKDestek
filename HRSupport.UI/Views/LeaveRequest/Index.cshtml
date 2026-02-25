@@ -89,7 +89,9 @@
                                         <a asp-action="Edit" asp-controller="LeaveRequest" asp-route-id="@item.Id" class="btn btn-outline-primary" title="Düzenle">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        @* İleride yönetici / IK için onay-red butonları burada genişletilebilir *@
+                                        <a asp-action="Print" asp-controller="LeaveRequest" asp-route-id="@item.Id" class="btn btn-outline-secondary" title="Yazdır" target="_blank">
+                                            <i class="bi bi-printer"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>

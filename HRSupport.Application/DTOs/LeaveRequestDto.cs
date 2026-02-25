@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using HRSupport.Domain.Enum; // Type için bu using'in olduğundan emin ol
 
 namespace HRSupport.Application.DTOs
@@ -10,7 +10,7 @@ namespace HRSupport.Application.DTOs
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public LeaveStatus Status { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         // EKSİK OLAN VE EKLENMESİ GEREKEN ALANLAR:
         public LeaveType Type { get; set; }

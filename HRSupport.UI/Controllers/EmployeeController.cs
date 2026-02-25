@@ -17,7 +17,7 @@ namespace HRSupport.UI.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Employee";
             try
@@ -55,7 +55,7 @@ namespace HRSupport.UI.Controllers
                 return View(model);
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Employee/create";
 
@@ -94,7 +94,7 @@ namespace HRSupport.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/Employee/{id}";
 
             var response = await client.GetFromJsonAsync<ApiResult<UpdateEmployeeViewModel>>(apiUrl);
@@ -115,7 +115,7 @@ namespace HRSupport.UI.Controllers
                 return View(model);
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Employee/update";
 
             try
@@ -142,7 +142,7 @@ namespace HRSupport.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/Employee/delete/{id}";
 
             try

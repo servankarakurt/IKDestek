@@ -17,7 +17,7 @@ namespace HRSupport.UI.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern";
             var response = await client.GetFromJsonAsync<ApiResult<List<InternViewModel>>>(apiUrl);
@@ -39,7 +39,7 @@ namespace HRSupport.UI.Controllers
                 return View(model);
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern/create";
 
@@ -78,7 +78,7 @@ namespace HRSupport.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/Intern/{id}";
 
             var response = await client.GetFromJsonAsync<ApiResult<UpdateInternViewModel>>(apiUrl);
@@ -97,7 +97,7 @@ namespace HRSupport.UI.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern/update";
 
             try
@@ -122,7 +122,7 @@ namespace HRSupport.UI.Controllers
 
         private async Task LoadMentorsAsync()
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Employee";
 
             try
@@ -140,7 +140,7 @@ namespace HRSupport.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Print(int id)
         {
-            var client = _httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/LeaveRequest/{id}";
 
             try

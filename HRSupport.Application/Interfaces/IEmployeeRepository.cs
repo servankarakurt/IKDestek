@@ -1,4 +1,4 @@
-﻿using HRSupport.Domain.Entites;
+using HRSupport.Domain.Entities;
 using HRSupport.Domain.Enum;
 
 namespace HRSupport.Application.Interfaces
@@ -9,7 +9,7 @@ namespace HRSupport.Application.Interfaces
         Task<Employee?> GetByIdAsync(int id);
         Task<Employee?> GetByEmailAsync(string email);
         Task<IEnumerable<Employee>> GetByDepartmentAsync(Department department);
-        Task<int> AddAsync(Employee entites);
+        Task<int> AddAsync(Employee entity);
         Task<Employee> UpdateAsync(Employee employee);
         Task<Employee?> DeleteAsync(int id);
     }

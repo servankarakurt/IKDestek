@@ -1,5 +1,5 @@
-﻿using HRSupport.Domain.Common;
-using HRSupport.Domain.Entites;
+using HRSupport.Domain.Common;
+using HRSupport.Domain.Entities;
 using HRSupport.Domain.Enum;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,11 +16,13 @@ namespace HRSupport.Infrastructure.Context
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
         public DbSet<Intern> Interns { get; set; }
         public DbSet<LeaveApprovalHistory> LeaveApprovalHistories { get; set; }
+        public DbSet<EmployeeLeaveBalance> EmployeeLeaveBalances { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Employee>().ToTable("Employees");
-            modelBuilder.Entity<Employee>().Ignore(e => e.Fullname);
+            modelBuilder.Entity<Employee>().Ignore(e => e.FullName);
 
             modelBuilder.Entity<Employee>()
                 .Property(e => e.Department)
@@ -30,7 +32,7 @@ namespace HRSupport.Infrastructure.Context
             modelBuilder.Entity<LeaveRequest>().ToTable("LeaveRequests");
             modelBuilder.Entity<LeaveRequest>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Intern>().HasQueryFilter(e => !e.IsDeleted);
-
+            modelBuilder.Entity<EmployeeLeaveBalance>().ToTable("EmployeeLeaveBalances");
         }
     }
 }

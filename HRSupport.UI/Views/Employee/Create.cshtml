@@ -1,4 +1,4 @@
-﻿@model HRSupport.UI.Models.CreateEmployeeViewModel
+@model HRSupport.UI.Models.CreateEmployeeViewModel
 
 @{
     ViewData["Title"] = "Yeni Çalışan Ekle";
@@ -73,7 +73,11 @@
                                         <option value="">Seçiniz...</option>
                                         <option value="1">Yazılım</option>
                                         <option value="2">İnsan Kaynakları</option>
-                                        <option value="3">Muhasebe</option>
+                                        <option value="3">Satış</option>
+                                        <option value="4">Muhasebe</option>
+                                        <option value="5">Pazarlama</option>
+                                        <option value="6">Operasyon</option>
+                                        <option value="7">Acente</option>
                                     </select>
                                     <label asp-for="Department">Departman</label>
                                 </div>
@@ -82,9 +86,10 @@
                                 <div class="form-floating">
                                     <select asp-for="Roles" class="form-select rounded-3">
                                         <option value="1">Admin</option>
-                                        <option value="2">HR</option>
-                                        <option value="3">Manager</option>
-                                        <option value="4" selected>Employee</option>
+                                        <option value="2">İK</option>
+                                        <option value="3">Yönetici</option>
+                                        <option value="4" selected>Çalışan</option>
+                                        <option value="5">Stajyer</option>
                                     </select>
                                     <label asp-for="Roles">Sistem Rolü</label>
                                 </div>
