@@ -33,7 +33,33 @@ namespace HRSupport.UI.Controllers
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/Auth/login";
             var client = _httpClientFactory.CreateClient();
-            var response = await client.PostAsJsonAsync(apiUrl, new { model.Email, model.Password });
+            client.Timeout = TimeSpan.FromSeconds(15);
+
+            HttpResponseMessage response;
+            try
+            {
+                response = await client.PostAsJsonAsync(apiUrl, new { model.Email, model.Password });
+            }
+            catch (TaskCanceledException)
+            {
+                ModelState.AddModelError("", "API yanıt vermedi (zaman aşımı). Lütfen WebAPI'nin çalıştığından emin olun: " + apiUrl);
+                return View(model);
+            }
+            catch (TimeoutException)
+            {
+                ModelState.AddModelError("", "API yanıt vermedi (zaman aşımı). WebAPI projesini başlatıp tekrar deneyin.");
+                return View(model);
+            }
+            catch (HttpRequestException)
+            {
+                ModelState.AddModelError("", "API'ye bağlanılamadı. Lütfen WebAPI projesinin çalıştığından ve adresin doğru olduğundan emin olun.");
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Bağlantı hatası: " + (ex.Message.Length > 80 ? ex.Message.Substring(0, 80) + "…" : ex.Message));
+                return View(model);
+            }
 
             var json = await response.Content.ReadAsStringAsync();
             var result = System.Text.Json.JsonSerializer.Deserialize<ApiResult<LoginResponseModel>>(json,

@@ -11,15 +11,18 @@ namespace HRSupport.Application.Features.Auth.Commands
 {
     public class LoginHandler : IRequestHandler<LoginCommand, Result<LoginResponseDto>>
     {
+        private readonly IUserRepository _userRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IInternRepository _internRepository;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
         public LoginHandler(
+            IUserRepository userRepository,
             IEmployeeRepository employeeRepository,
             IInternRepository internRepository,
             IJwtTokenGenerator jwtTokenGenerator)
         {
+            _userRepository = userRepository;
             _employeeRepository = employeeRepository;
             _internRepository = internRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
@@ -32,15 +35,43 @@ namespace HRSupport.Application.Features.Auth.Commands
 
             var email = request.Email.Trim();
 
+            // 1) Önce Users tablosunda ara (migration ile seed edilen Admin/IK: admin@hepiyi.com vb.)
+            var user = await _userRepository.GetByEmailAsync(email);
+            if (user != null)
+                return ValidateAndBuildResultForUser(user, request.Password);
+
+            // 2) Sonra Employees tablosunda ara: Admin, IK, Yönetici, Çalışan (Roles ile ayrılır)
             var employee = await _employeeRepository.GetByEmailAsync(email);
             if (employee != null)
                 return ValidateAndBuildResult(employee, null, request.Password);
 
+            // 3) En son Stajyer (Intern) tablosunda ara
             var intern = await _internRepository.GetByEmailAsync(email);
             if (intern != null)
                 return ValidateAndBuildResult(null, intern, request.Password);
 
             return Result<LoginResponseDto>.Failure("Geçersiz e-posta veya şifre.");
+        }
+
+        private Result<LoginResponseDto> ValidateAndBuildResultForUser(User user, string password)
+        {
+            if (string.IsNullOrEmpty(user.PasswordHash))
+                return Result<LoginResponseDto>.Failure("Bu hesap için şifre tanımlanmamış. Lütfen yöneticinize başvurun.");
+            if (!PasswordHelper.Verify(password.Trim(), user.PasswordHash))
+                return Result<LoginResponseDto>.Failure("Geçersiz e-posta veya şifre.");
+            var roleName = user.Role.ToString();
+            var fullName = string.IsNullOrEmpty(user.Email) ? "Sistem Kullanıcısı" : user.Email;
+            var token = _jwtTokenGenerator.GenerateToken(user.Id, user.Email, roleName, fullName, "User", null);
+            return Result<LoginResponseDto>.Success(new LoginResponseDto
+            {
+                Token = token,
+                Email = user.Email,
+                Role = roleName,
+                UserId = user.Id,
+                FullName = fullName,
+                UserType = "User",
+                MustChangePassword = user.IsPasswordChangeRequired
+            });
         }
 
         private Result<LoginResponseDto> ValidateAndBuildResult(Employee? employee, Intern? intern, string password)

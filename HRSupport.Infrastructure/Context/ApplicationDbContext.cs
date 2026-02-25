@@ -17,18 +17,21 @@ namespace HRSupport.Infrastructure.Context
         public DbSet<Intern> Interns { get; set; }
         public DbSet<LeaveApprovalHistory> LeaveApprovalHistories { get; set; }
         public DbSet<EmployeeLeaveBalance> EmployeeLeaveBalances { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Employee>().ToTable("Employees");
             modelBuilder.Entity<Employee>().Ignore(e => e.FullName);
-
             modelBuilder.Entity<Employee>()
                 .Property(e => e.Department)
                 .HasColumnName("Department");
-
             modelBuilder.Entity<Employee>().HasQueryFilter(e => !e.IsDeleted);
+
+            modelBuilder.Entity<User>().ToTable("Users");
+            modelBuilder.Entity<User>().Property(u => u.Role).HasColumnName("Role");
+            modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
             modelBuilder.Entity<LeaveRequest>().ToTable("LeaveRequests");
             modelBuilder.Entity<LeaveRequest>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Intern>().HasQueryFilter(e => !e.IsDeleted);

@@ -26,6 +26,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
 
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 builder.Services.AddScoped<IInternRepository, InternRepository>();
 builder.Services.AddScoped<IEmployeeLeaveBalanceRepository, EmployeeLeaveBalanceRepository>();
@@ -39,7 +40,8 @@ builder.Services.AddAutoMapper(typeof(HRSupport.Application.Mappings.MappingProf
 var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
 var secret = jwtSettings?.SecretKey ?? "";
 var issuer = jwtSettings?.Issuer ?? "";
-var audience = jwtSettings?.Audience?.FirstOrDefault() ?? issuer;
+var audiences = jwtSettings?.Audience ?? Array.Empty<string>();
+if (audiences.Length == 0) audiences = new[] { issuer };
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -51,13 +53,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = true,
             ValidIssuer = issuer,
             ValidateAudience = true,
-            ValidAudience = audience,
+            ValidAudiences = audiences.Length > 0 ? audiences : new[] { issuer },
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.FromMinutes(1)
         };
         options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
         {
-            // Token yok/geçersiz: 401 dönme, pipeline devam etsin; [AllowAnonymous] ile login çalışsın
             OnAuthenticationFailed = context =>
             {
                 context.NoResult();

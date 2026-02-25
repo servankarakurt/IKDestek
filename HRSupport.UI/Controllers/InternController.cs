@@ -1,3 +1,5 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using HRSupport.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,14 +17,36 @@ namespace HRSupport.UI.Controllers
             _configuration = configuration;
         }
 
+        private async Task<HttpResponseMessage> SendWithTokenAsync(HttpMethod method, string url, HttpContent? content = null)
+        {
+            var token = HttpContext.Session.GetString("Token");
+            var client = _httpClientFactory.CreateClient();
+            var request = new HttpRequestMessage(method, url) { Content = content };
+            if (!string.IsNullOrEmpty(token))
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            return await client.SendAsync(request);
+        }
+
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient("ApiWithAuth");
+            var token = HttpContext.Session.GetString("Token");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Index", "Intern") });
 
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern";
-            var response = await client.GetFromJsonAsync<ApiResult<List<InternViewModel>>>(apiUrl);
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/Intern";
+            var response = await SendWithTokenAsync(HttpMethod.Get, apiUrl);
 
-            return View(response?.Value ?? new List<InternViewModel>());
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                HttpContext.Session.Clear();
+                TempData["LoginMessage"] = "Oturumunuz sona erdi veya token geçersiz. Tekrar giriş yapın.";
+                return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Index", "Intern") });
+            }
+
+            var result = response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<ApiResult<List<InternViewModel>>>()
+                : null;
+            return View(result?.Value ?? new List<InternViewModel>());
         }
 
         [HttpGet]
@@ -39,13 +63,11 @@ namespace HRSupport.UI.Controllers
                 return View(model);
             }
 
-            var client = _httpClientFactory.CreateClient("ApiWithAuth");
-
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern/create";
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/Intern/create";
 
             try
             {
-                var response = await client.PostAsJsonAsync(apiUrl, model);
+                var response = await SendWithTokenAsync(HttpMethod.Post, apiUrl, JsonContent.Create(model));
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -78,18 +100,16 @@ namespace HRSupport.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var client = _httpClientFactory.CreateClient("ApiWithAuth");
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/Intern/{id}";
-
-            var response = await client.GetFromJsonAsync<ApiResult<UpdateInternViewModel>>(apiUrl);
-
-            if (response == null || !response.IsSuccess || response.Value == null)
-            {
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + $"/api/Intern/{id}";
+            var response = await SendWithTokenAsync(HttpMethod.Get, apiUrl);
+            if (!response.IsSuccessStatusCode)
                 return NotFound();
-            }
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<UpdateInternViewModel>>();
+            if (result == null || !result.IsSuccess || result.Value == null)
+                return NotFound();
 
             await LoadMentorsAsync();
-            return View(response.Value);
+            return View(result.Value);
         }
 
         [HttpPost]
@@ -97,12 +117,11 @@ namespace HRSupport.UI.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var client = _httpClientFactory.CreateClient("ApiWithAuth");
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Intern/update";
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/Intern/update";
 
             try
             {
-                var response = await client.PutAsJsonAsync(apiUrl, model);
+                var response = await SendWithTokenAsync(HttpMethod.Put, apiUrl, JsonContent.Create(model));
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -122,14 +141,12 @@ namespace HRSupport.UI.Controllers
 
         private async Task LoadMentorsAsync()
         {
-            var client = _httpClientFactory.CreateClient("ApiWithAuth");
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Employee";
-
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/Employee";
             try
             {
-                var response = await client.GetFromJsonAsync<ApiResult<List<EmployeeLookupViewModel>>>(apiUrl);
-                var mentors = response?.Value ?? new List<EmployeeLookupViewModel>();
-
+                var response = await SendWithTokenAsync(HttpMethod.Get, apiUrl);
+                var result = response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<ApiResult<List<EmployeeLookupViewModel>>>() : null;
+                var mentors = result?.Value ?? new List<EmployeeLookupViewModel>();
                 ViewBag.Mentors = new SelectList(mentors, "Id", "FullName");
             }
             catch
@@ -140,26 +157,18 @@ namespace HRSupport.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Print(int id)
         {
-            var client = _httpClientFactory.CreateClient("ApiWithAuth");
-            var apiUrl = _configuration["ApiSettings:BaseUrl"] + $"/api/LeaveRequest/{id}";
-
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + $"/api/LeaveRequest/{id}";
             try
             {
-                // İzin detaylarını API'den çekiyoruz
-                var response = await client.GetFromJsonAsync<ApiResult<LeaveRequestViewModel>>(apiUrl);
-
-                if (response != null && response.IsSuccess && response.Value != null)
+                var response = await SendWithTokenAsync(HttpMethod.Get, apiUrl);
+                if (response.IsSuccessStatusCode)
                 {
-                    // Sadece Onaylanmış izinlerin yazdırılmasını güvenlik için kontrol edebilirsin
-                    // if(response.Value.Status != 3) return BadRequest("Sadece onaylanmış izinler yazdırılabilir.");
-
-                    return View(response.Value);
+                    var result = await response.Content.ReadFromJsonAsync<ApiResult<LeaveRequestViewModel>>();
+                    if (result != null && result.IsSuccess && result.Value != null)
+                        return View(result.Value);
                 }
             }
-            catch (Exception ex)
-            {
-               // _logger.LogError($"Yazdırma için izin çekilirken hata: {ex.Message}");
-            }
+            catch { }
 
             return NotFound("İzin belgesi bulunamadı.");
         }
