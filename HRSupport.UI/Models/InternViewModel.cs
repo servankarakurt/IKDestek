@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace HRSupport.UI.Models
 {
@@ -57,5 +57,39 @@ namespace HRSupport.UI.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int? MentorId { get; set; }
+    }
+
+    public class InternDetailViewModel
+    {
+        public int Id { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string? University { get; set; }
+        public string? Major { get; set; }
+        public int Grade { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string? MentorName { get; set; }
+        public List<InternTaskItemViewModel> Tasks { get; set; } = new();
+        public List<MentorNoteItemViewModel> MentorNotes { get; set; } = new();
+    }
+
+    public class InternTaskItemViewModel
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public bool IsCompleted { get; set; }
+        public DateTime CreatedTime { get; set; }
+    }
+
+    public class MentorNoteItemViewModel
+    {
+        public int Id { get; set; }
+        public string NoteText { get; set; } = string.Empty;
+        public DateTime? NoteDate { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public string? MentorName { get; set; }
     }
 }

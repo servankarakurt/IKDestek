@@ -48,6 +48,13 @@ namespace HRSupport.Infrastructure.Repositories
             return intern;
         }
 
+        public async Task<IEnumerable<Intern>> GetByMentorIdAsync(int mentorId)
+        {
+            return await _context.Interns
+                .Where(x => x.MentorId == mentorId)
+                .ToListAsync();
+        }
+
         public async Task<Intern?> DeleteAsync(int id)
         {
             var intern = await _context.Interns.FirstOrDefaultAsync(x => x.Id == id);

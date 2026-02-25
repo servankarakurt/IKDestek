@@ -13,15 +13,18 @@ namespace HRSupport.Application.Features.LeaveRequests.Commands
     {
         private readonly ILeaveRequestRepository _leaveRequestRepository;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeLeaveBalanceRepository _balanceRepository;
         private readonly ICurrentUserService _currentUser;
 
         public UpdateLeaveRequestStatusHandler(
             ILeaveRequestRepository leaveRequestRepository,
             IEmployeeRepository employeeRepository,
+            IEmployeeLeaveBalanceRepository balanceRepository,
             ICurrentUserService currentUser)
         {
             _leaveRequestRepository = leaveRequestRepository;
             _employeeRepository = employeeRepository;
+            _balanceRepository = balanceRepository;
             _currentUser = currentUser;
         }
 
@@ -40,6 +43,22 @@ namespace HRSupport.Application.Features.LeaveRequests.Commands
                 var employee = await _employeeRepository.GetByIdAsync(leaveRequest.EmployeeId);
                 if (employee == null || (int)employee.Department != _currentUser.DepartmentId.Value)
                     return Result<bool>.Failure("Sadece kendi biriminize ait izin taleplerini onaylayabilirsiniz.");
+            }
+
+            if (request.NewStatus == LeaveStatus.Onaylandı)
+            {
+                var balance = await _balanceRepository.GetByEmployeeIdAsync(leaveRequest.EmployeeId);
+                if (balance == null)
+                {
+                    balance = new EmployeeLeaveBalance
+                    {
+                        EmployeeId = leaveRequest.EmployeeId,
+                        RemainingAnnualLeaveDays = 20
+                    };
+                    await _balanceRepository.AddAsync(balance);
+                }
+                balance.RemainingAnnualLeaveDays -= leaveRequest.RequestedDays;
+                await _balanceRepository.UpdateAsync(balance);
             }
 
             leaveRequest.Status = request.NewStatus;

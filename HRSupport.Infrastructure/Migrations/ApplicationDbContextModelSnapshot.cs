@@ -78,6 +78,9 @@ namespace HRSupport.Infrastructure.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("TCKN")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Employees", (string)null);
@@ -109,6 +112,43 @@ namespace HRSupport.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EmployeeLeaveBalances", (string)null);
+                });
+
+            modelBuilder.Entity("HRSupport.Domain.Entities.EmployeeNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedByUserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Isactive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NoteText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeNotes", (string)null);
                 });
 
             modelBuilder.Entity("HRSupport.Domain.Entities.Intern", b =>
@@ -174,6 +214,43 @@ namespace HRSupport.Infrastructure.Migrations
                     b.HasIndex("MentorId");
 
                     b.ToTable("Interns");
+                });
+
+            modelBuilder.Entity("HRSupport.Domain.Entities.InternTask", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("InternId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Isactive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InternId");
+
+                    b.ToTable("InternTasks", (string)null);
                 });
 
             modelBuilder.Entity("HRSupport.Domain.Entities.LeaveApprovalHistory", b =>
@@ -260,6 +337,93 @@ namespace HRSupport.Infrastructure.Migrations
                     b.ToTable("LeaveRequests", (string)null);
                 });
 
+            modelBuilder.Entity("HRSupport.Domain.Entities.MentorNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("InternId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Isactive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("MentorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("NoteDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoteText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InternId");
+
+                    b.HasIndex("MentorId");
+
+                    b.ToTable("MentorNotes", (string)null);
+                });
+
+            modelBuilder.Entity("HRSupport.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPasswordChangeRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Isactive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int")
+                        .HasColumnName("Role");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("HRSupport.Domain.Entities.EmployeeNote", b =>
+                {
+                    b.HasOne("HRSupport.Domain.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("HRSupport.Domain.Entities.Intern", b =>
                 {
                     b.HasOne("HRSupport.Domain.Entities.Employee", "Mentor")
@@ -269,6 +433,17 @@ namespace HRSupport.Infrastructure.Migrations
                     b.Navigation("Mentor");
                 });
 
+            modelBuilder.Entity("HRSupport.Domain.Entities.InternTask", b =>
+                {
+                    b.HasOne("HRSupport.Domain.Entities.Intern", "Intern")
+                        .WithMany()
+                        .HasForeignKey("InternId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Intern");
+                });
+
             modelBuilder.Entity("HRSupport.Domain.Entities.LeaveApprovalHistory", b =>
                 {
                     b.HasOne("HRSupport.Domain.Entities.LeaveRequest", null)
@@ -276,6 +451,23 @@ namespace HRSupport.Infrastructure.Migrations
                         .HasForeignKey("LeaveRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("HRSupport.Domain.Entities.MentorNote", b =>
+                {
+                    b.HasOne("HRSupport.Domain.Entities.Intern", "Intern")
+                        .WithMany()
+                        .HasForeignKey("InternId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRSupport.Domain.Entities.Employee", "Mentor")
+                        .WithMany()
+                        .HasForeignKey("MentorId");
+
+                    b.Navigation("Intern");
+
+                    b.Navigation("Mentor");
                 });
 
             modelBuilder.Entity("HRSupport.Domain.Entities.LeaveRequest", b =>

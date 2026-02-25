@@ -16,7 +16,6 @@ namespace HRSupport.UI.Handlers
             var token = _httpContextAccessor.HttpContext?.Session.GetString("Token");
             if (!string.IsNullOrEmpty(token))
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
             return await base.SendAsync(request, cancellationToken);
         }
     }

@@ -1,7 +1,23 @@
-﻿@model List<HRSupport.UI.Models.EmployeeViewModel>
+@model List<HRSupport.UI.Models.EmployeeViewModel>
 @{ ViewData["Title"] = "Çalışan Yönetimi"; }
 
 <div class="container-fluid py-4">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow" role="alert">
+            <strong><i class="bi bi-exclamation-triangle-fill"></i> Hata:</strong>
+            @foreach (var key in ViewData.ModelState.Keys)
+            {
+                foreach (var err in ViewData.ModelState[key]!.Errors)
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            }
+            <hr />
+            <small>Detay için: <a href="/Employee/Diagnostic" target="_blank">/Employee/Diagnostic</a> sayfasını açıp çıktıyı kopyalayın.</small>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
     <div class="row mb-4">
         <div class="col-md-6">
             <h1 class="display-5 fw-bold text-dark">
@@ -64,6 +80,9 @@
                                 <td>@emp.StartDate.ToString("dd.MM.yyyy")</td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Detail" asp-controller="Employee" asp-route-id="@emp.Id" class="btn btn-outline-info" title="Detay">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <a asp-action="Edit" asp-controller="Employee" asp-route-id="@emp.Id" class="btn btn-outline-primary" title="Düzenle">
                                             <i class="bi bi-pencil"></i>
                                         </a>
@@ -110,16 +129,11 @@
 @section Scripts {
     <script>
         function deleteEmployee(id) {
-            // Kullanıcıya emin olup olmadığını soruyoruz
-            if (confirm("Bu personeli silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) {
-
-                // Arka planda silme isteği atıyoruz
-                fetch('/Employee/Delete/' + id, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+            if (!confirm("Bu personeli silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;
+            fetch('/Employee/Delete/' + id, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {

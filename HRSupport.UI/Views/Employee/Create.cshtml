@@ -13,7 +13,10 @@
                     <small class="text-white-50">Lütfen çalışan bilgilerini eksiksiz doldurun.</small>
                 </div>
                 <div class="card-body p-5 bg-light">
-
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                    }
                     <form asp-action="Create" method="post">
                         <h6 class="text-muted fw-bold mb-3 border-bottom pb-2">Kişisel Bilgiler</h6>
                         <div class="row g-3 mb-4">
@@ -39,6 +42,12 @@
                                 <div class="form-floating">
                                     <input asp-for="CardID" type="number" class="form-control rounded-3" placeholder="Kart ID" required />
                                     <label asp-for="CardID">Giriş Kartı ID</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="TCKN" class="form-control rounded-3" placeholder="TCKN" maxlength="11" />
+                                    <label asp-for="TCKN">TC Kimlik No (opsiyonel)</label>
                                 </div>
                             </div>
                         </div>

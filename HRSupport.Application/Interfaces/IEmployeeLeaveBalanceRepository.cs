@@ -6,5 +6,7 @@ namespace HRSupport.Application.Interfaces
     public interface IEmployeeLeaveBalanceRepository
     {
         Task<EmployeeLeaveBalance?> GetByEmployeeIdAsync(int employeeId);
+        Task AddAsync(EmployeeLeaveBalance balance);
+        Task UpdateAsync(EmployeeLeaveBalance balance);
     }
 }

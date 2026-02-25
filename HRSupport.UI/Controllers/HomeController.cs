@@ -16,15 +16,19 @@ namespace HRSupport.UI.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var role = HttpContext.Session.GetString("Role") ?? "";
+            if (role == "Stajyer" || role == "Çalışan")
+                return RedirectToAction("Index", "PersonelPanel");
+
             var client = _httpClientFactory.CreateClient("ApiWithAuth");
             var apiUrl = _configuration["ApiSettings:BaseUrl"] + "/api/Dashboard/stats";
 
             try
             {
-                var response = await client.GetFromJsonAsync<DashboardStatsViewModel>(apiUrl);
-                if (response != null)
+                var response = await client.GetFromJsonAsync<ApiResult<DashboardStatsViewModel>>(apiUrl);
+                if (response?.IsSuccess == true && response.Value != null)
                 {
-                    return View(response); 
+                    return View(response.Value);
                 }
             }
             catch (Exception ex)

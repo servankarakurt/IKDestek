@@ -4,4 +4,5 @@
   <Project Path="HRSupport.Infrastructure/HRSupport.Infrastructure.csproj" />
   <Project Path="HRSupport.UI/HRSupport.UI.csproj" Id="10302b1d-0381-4211-9d3e-cab1967f8815" />
   <Project Path="HRSupport.WebAPI/HRSupport.WebAPI.csproj" />
+  <Project Path="HRSupport.Tests/HRSupport.Tests.csproj" />
 </Solution>

@@ -13,9 +13,7 @@ namespace HRSupport.UI.Filters
 
             var token = context.HttpContext.Session.GetString("Token");
             if (string.IsNullOrEmpty(token))
-            {
                 context.Result = new RedirectToActionResult("Login", "Auth", new { returnUrl = context.HttpContext.Request.Path });
-            }
         }
     }
 }

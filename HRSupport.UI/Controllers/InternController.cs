@@ -29,6 +29,7 @@ namespace HRSupport.UI.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (IsStajyer()) return RedirectToAction("Index", "PersonelPanel");
             var token = HttpContext.Session.GetString("Token");
             if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Index", "Intern") });
@@ -50,14 +51,18 @@ namespace HRSupport.UI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            if (IsStajyer()) return RedirectToAction("Index", "PersonelPanel");
+            await LoadMentorsAsync();
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateInternViewModel model)
         {
+            if (IsStajyer()) return RedirectToAction("Index", "PersonelPanel");
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -95,11 +100,58 @@ namespace HRSupport.UI.Controllers
                 ModelState.AddModelError("", $"Bağlantı hatası: {ex.Message}");
             }
 
+            await LoadMentorsAsync();
             return View(model);
         }
         [HttpGet]
+        public async Task<IActionResult> Detail(int id)
+        {
+            if (IsStajyer() && HttpContext.Session.GetInt32("UserId") != id) return RedirectToAction("Index", "PersonelPanel");
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + $"/api/Intern/{id}/detail";
+            var response = await SendWithTokenAsync(HttpMethod.Get, apiUrl);
+            if (!response.IsSuccessStatusCode) return NotFound();
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<InternDetailViewModel>>(new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (result?.Value == null) return NotFound();
+            await LoadMentorsAsync();
+            return View(result.Value);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddTask(int internId, string title, string? description)
+        {
+            if (IsStajyer()) return RedirectToAction("Index", "PersonelPanel");
+            if (string.IsNullOrWhiteSpace(title)) { TempData["ErrorMessage"] = "Görev başlığı zorunludur."; return RedirectToAction(nameof(Detail), new { id = internId }); }
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/Intern/tasks";
+            var body = JsonContent.Create(new { internId, title, description });
+            var response = await SendWithTokenAsync(HttpMethod.Post, apiUrl, body);
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<int>>();
+            if (result?.IsSuccess == true) TempData["SuccessMessage"] = "Görev eklendi.";
+            else TempData["ErrorMessage"] = result?.Error ?? "Görev eklenemedi.";
+            return RedirectToAction(nameof(Detail), new { id = internId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddMentorNote(int internId, string noteText, string? noteDate)
+        {
+            if (IsStajyer()) return RedirectToAction("Index", "PersonelPanel");
+            if (string.IsNullOrWhiteSpace(noteText)) { TempData["ErrorMessage"] = "Not metni zorunludur."; return RedirectToAction(nameof(Detail), new { id = internId }); }
+            DateTime? nd = null;
+            if (!string.IsNullOrWhiteSpace(noteDate) && DateTime.TryParse(noteDate, out var d)) nd = d;
+            var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/Intern/mentor-notes";
+            var body = JsonContent.Create(new { internId, noteText, noteDate = nd });
+            var response = await SendWithTokenAsync(HttpMethod.Post, apiUrl, body);
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<int>>();
+            if (result?.IsSuccess == true) TempData["SuccessMessage"] = "Mentor notu eklendi.";
+            else TempData["ErrorMessage"] = result?.Error ?? "Not eklenemedi.";
+            return RedirectToAction(nameof(Detail), new { id = internId });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
+            if (IsStajyer()) return RedirectToAction("Index", "PersonelPanel");
             var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + $"/api/Intern/{id}";
             var response = await SendWithTokenAsync(HttpMethod.Get, apiUrl);
             if (!response.IsSuccessStatusCode)
@@ -113,8 +165,10 @@ namespace HRSupport.UI.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UpdateInternViewModel model)
         {
+            if (IsStajyer()) return RedirectToAction("Index", "PersonelPanel");
             if (!ModelState.IsValid) return View(model);
 
             var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + "/api/Intern/update";
@@ -157,6 +211,7 @@ namespace HRSupport.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Print(int id)
         {
+            if (IsStajyer()) return RedirectToAction("Index", "PersonelPanel");
             var apiUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') + $"/api/LeaveRequest/{id}";
             try
             {
@@ -172,5 +227,7 @@ namespace HRSupport.UI.Controllers
 
             return NotFound("İzin belgesi bulunamadı.");
         }
+
+        private bool IsStajyer() => string.Equals(HttpContext.Session.GetString("Role"), "Stajyer", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -12,15 +12,18 @@ namespace HRSupport.Application.Features.Employees.Commands
     public class CreateEmployeeHandler : IRequestHandler<CreateEmployeeCommand, Result<int>>
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEmployeeLeaveBalanceRepository _balanceRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<CreateEmployeeHandler> _logger;
 
         public CreateEmployeeHandler(
             IEmployeeRepository employeeRepository,
+            IEmployeeLeaveBalanceRepository balanceRepository,
             IMapper mapper,
             ILogger<CreateEmployeeHandler> logger)
         {
             _employeeRepository = employeeRepository;
+            _balanceRepository = balanceRepository;
             _mapper = mapper;
             _logger = logger;
         }
@@ -29,12 +32,22 @@ namespace HRSupport.Application.Features.Employees.Commands
         {
             var employee = _mapper.Map<Employee>(request);
 
-            // Generate a temporary password for the new user and store its hash
+            // E-posta tutarlı arama için küçük harf ve trim (girişte aynı normalleştirme kullanılıyor)
+            if (!string.IsNullOrWhiteSpace(employee.Email))
+                employee.Email = employee.Email.Trim().ToLowerInvariant();
+
+            // Geçici şifre: sadece alfanumerik (kopyala-yapıştır ve HTML kaçış sorunlarını önlemek için)
             var tempPassword = GenerateTemporaryPassword(10);
             employee.PasswordHash = PasswordHelper.Hash(tempPassword);
             employee.MustChangePassword = true;
 
             var employeeId = await _employeeRepository.AddAsync(employee);
+
+            await _balanceRepository.AddAsync(new EmployeeLeaveBalance
+            {
+                EmployeeId = employeeId,
+                RemainingAnnualLeaveDays = 20
+            });
 
             _logger.LogInformation("Employee created. EmployeeId: {EmployeeId}, Email: {Email}", employeeId, request.Email);
 
@@ -45,7 +58,8 @@ namespace HRSupport.Application.Features.Employees.Commands
 
         private static string GenerateTemporaryPassword(int length = 10)
         {
-            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_";
+            // Sadece alfanumerik: kopyala-yapıştır ve girişte karakter kaybı olmaması için
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var sb = new StringBuilder();
             using var rng = RandomNumberGenerator.Create();
             var buffer = new byte[4];

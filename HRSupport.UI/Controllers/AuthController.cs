@@ -17,8 +17,13 @@ namespace HRSupport.UI.Controllers
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {
+            var role = HttpContext.Session.GetString("Role") ?? "";
             if (!string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+            {
+                if (role == "Stajyer" || role == "Çalışan")
+                    return RedirectToAction("Index", "PersonelPanel");
                 return RedirectToAction("Index", "Home");
+            }
             ViewData["ReturnUrl"] = returnUrl;
             return View(new LoginViewModel());
         }
@@ -77,6 +82,9 @@ namespace HRSupport.UI.Controllers
 
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     return Redirect(returnUrl);
+                var role = data.Role ?? "";
+                if (role == "Stajyer" || role == "Çalışan")
+                    return RedirectToAction("Index", "PersonelPanel");
                 return RedirectToAction("Index", "Home");
             }
 

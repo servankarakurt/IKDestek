@@ -26,11 +26,11 @@ namespace HRSupport.Application.Features.Employees.Queries
         public async Task<Result<IEnumerable<EmployeeDto>>> Handle(GetAllEmployeesQuery request, CancellationToken cancellationToken)
         {
             IEnumerable<Domain.Entities.Employee> employees;
-            var role = _currentUser.Role ?? "";
+            var role = (_currentUser.Role ?? "").Trim();
 
-            if (role == "Admin" || role == "IK")
+            if (role.Contains("Admin", StringComparison.OrdinalIgnoreCase) || string.Equals(role, "IK", StringComparison.OrdinalIgnoreCase))
                 employees = await _employeeRepository.GetAllEmployeesAsync();
-            else if (role == "Yönetici" && _currentUser.DepartmentId.HasValue)
+            else if (role.Contains("Yönetici", StringComparison.OrdinalIgnoreCase) && _currentUser.DepartmentId.HasValue)
                 employees = await _employeeRepository.GetByDepartmentAsync((Department)_currentUser.DepartmentId.Value);
             else
                 employees = new List<Domain.Entities.Employee>();

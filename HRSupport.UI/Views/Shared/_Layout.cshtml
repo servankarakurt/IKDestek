@@ -13,7 +13,15 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light sticky-top">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                @{
+                    var role = Context.Session.GetString("Role") ?? "";
+                    var isAdminOrIk = role == "Admin" || role == "IK";
+                    var isYonetici = role == "Yönetici";
+                    var isPersonel = role == "Çalışan" || role == "Stajyer";
+                    var brandController = isPersonel ? "PersonelPanel" : "Home";
+                    var brandAction = "Index";
+                }
+                <a class="navbar-brand" asp-area="" asp-controller="@brandController" asp-action="@brandAction">
                     <i class="bi bi-briefcase-fill"></i>
                     HR Yönetimi
                 </a>
@@ -21,17 +29,14 @@
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                @{
-                    var role = Context.Session.GetString("Role") ?? "";
-                    var isAdminOrIk = role == "Admin" || role == "IK";
-                    var isYonetici = role == "Yönetici";
-                    var isPersonel = role == "Çalışan" || role == "Stajyer";
-                }
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index"><i class="bi bi-house-fill"></i> Anasayfa</a>
-                        </li>
+                        @if (!isPersonel)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index"><i class="bi bi-house-fill"></i> Anasayfa</a>
+                            </li>
+                        }
                         @if (isAdminOrIk)
                         {
                             <li class="nav-item"><a class="nav-link" asp-controller="Employee" asp-action="Index"><i class="bi bi-people-fill"></i> Çalışanlar</a></li>
@@ -40,13 +45,14 @@
                         }
                         else if (isYonetici)
                         {
+                            <li class="nav-item"><a class="nav-link" asp-controller="LeaveRequest" asp-action="Create"><i class="bi bi-plus-circle"></i> İzin Talebi Oluştur</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Employee" asp-action="Index"><i class="bi bi-people-fill"></i> Birimim - Çalışanlar</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="LeaveRequest" asp-action="Index"><i class="bi bi-calendar-event-fill"></i> İzin Talepleri (Onay)</a></li>
                         }
                         else if (isPersonel)
                         {
+                            <li class="nav-item"><a class="nav-link" asp-controller="PersonelPanel" asp-action="Index"><i class="bi bi-grid-1x2-fill"></i> Panelim</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="LeaveRequest" asp-action="MyBalance"><i class="bi bi-calendar-check"></i> Kalan İzin Günüm</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="LeaveRequest" asp-action="Create"><i class="bi bi-plus-circle"></i> İzin Talebi Oluştur</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="LeaveRequest" asp-action="Index"><i class="bi bi-list-ul"></i> Taleplerim</a></li>
                         }
                     </ul>

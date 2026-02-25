@@ -12,15 +12,40 @@ namespace HRSupport.Application.Features.LeaveRequests.Commands
     {
         private readonly ILeaveRequestRepository _leaveRequestRepository;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly ICurrentUserService _currentUser;
 
-        public CreateLeaveRequestHandler(ILeaveRequestRepository leaveRequestRepository, IEmployeeRepository employeeRepository)
+        public CreateLeaveRequestHandler(
+            ILeaveRequestRepository leaveRequestRepository,
+            IEmployeeRepository employeeRepository,
+            ICurrentUserService currentUser)
         {
             _leaveRequestRepository = leaveRequestRepository;
             _employeeRepository = employeeRepository;
+            _currentUser = currentUser;
         }
 
         public async Task<Result<int>> Handle(CreateLeaveRequestCommand request, CancellationToken cancellationToken)
         {
+            var role = _currentUser.Role ?? string.Empty;
+            var userId = _currentUser.UserId;
+            var departmentId = _currentUser.DepartmentId;
+
+            if (role == "Çalışan" || role == "Stajyer")
+            {
+                if (!userId.HasValue || request.EmployeeId != userId.Value)
+                    return Result<int>.Failure("Sadece kendiniz için izin talebi oluşturabilirsiniz.");
+            }
+            else if (role == "Yönetici")
+            {
+                var targetEmployeeForManager = await _employeeRepository.GetByIdAsync(request.EmployeeId);
+                if (targetEmployeeForManager == null || !departmentId.HasValue || (int)targetEmployeeForManager.Department != departmentId.Value)
+                    return Result<int>.Failure("Sadece kendi biriminiz için izin talebi oluşturabilirsiniz.");
+            }
+            else if (role != "Admin" && role != "IK")
+            {
+                return Result<int>.Failure("Bu işlem için yetkiniz yok.");
+            }
+
             var employee = await _employeeRepository.GetByIdAsync(request.EmployeeId);
             if (employee == null) return Result<int>.Failure("Personel bulunamadı.");
 

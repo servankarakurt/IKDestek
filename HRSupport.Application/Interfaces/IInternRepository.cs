@@ -12,5 +12,6 @@ namespace HRSupport.Application.Interfaces
         Task<int> AddAsync(Intern intern);
         Task<Intern> UpdateAsync(Intern intern);
         Task<Intern?> DeleteAsync(int id);
+        Task<IEnumerable<Intern>> GetByMentorIdAsync(int mentorId);
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HRSupport.UI.Controllers
 {
-    // Yalnızca yetkili kullanıcıların erişmesi için ileride buraya [Authorize] ekleyeceğiz.
+    /// <summary>Dashboard ve izin durumu güncelleme. Erişim RequireLoginFilter ile korunur; rol kontrolü API tarafında yapılır.</summary>
     public class DashboardController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -23,10 +23,10 @@ namespace HRSupport.UI.Controllers
 
             try
             {
-                var response = await client.GetFromJsonAsync<DashboardStatsViewModel>(apiUrl);
-                if (response != null)
+                var response = await client.GetFromJsonAsync<ApiResult<DashboardStatsViewModel>>(apiUrl);
+                if (response?.IsSuccess == true && response.Value != null)
                 {
-                    return View(response);
+                    return View(response.Value);
                 }
             }
             catch (Exception ex)
@@ -38,6 +38,7 @@ namespace HRSupport.UI.Controllers
             return View(new DashboardStatsViewModel());
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateLeaveStatus(int leaveRequestId, LeaveStatus newStatus, string? rejectReason)
         {
             var client = _httpClientFactory.CreateClient("ApiWithAuth");
@@ -71,8 +72,8 @@ namespace HRSupport.UI.Controllers
                 TempData["ErrorMessage"] = "Bağlantı hatası: " + ex.Message;
             }
 
-            // İşlem bittikten sonra tekrar Dashboard sayfasına (Index) geri dön
-            return RedirectToAction("Index");
+            // İşlem bittikten sonra anasayfaya (Home) dön; hem Admin/IK hem Yönetici aynı anasayfayı kullanıyor
+            return RedirectToAction("Index", "Home");
         }
     }
 }

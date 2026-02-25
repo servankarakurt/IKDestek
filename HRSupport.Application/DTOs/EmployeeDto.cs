@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace HRSupport.Application.DTOs
 {
@@ -21,5 +21,6 @@ namespace HRSupport.Application.DTOs
 
         public DateTime StartDate { get; set; }
         public bool IsActive { get; set; }
+        public string? TCKN { get; set; }
     }
 }

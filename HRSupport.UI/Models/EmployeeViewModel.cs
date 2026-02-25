@@ -30,6 +30,8 @@ namespace HRSupport.UI.Models
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
+        [Display(Name = "TC Kimlik No (opsiyonel)")]
+        public string? TCKN { get; set; }
         public int CardID { get; set; }
         public DateTime BirthDate { get; set; } = DateTime.Now.AddYears(-20);
         public DateTime StartDate { get; set; } = DateTime.Now;
@@ -46,10 +48,46 @@ namespace HRSupport.UI.Models
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
+        [Display(Name = "TC Kimlik No (opsiyonel)")]
+        public string? TCKN { get; set; }
         public int CardID { get; set; }
         public DateTime BirthDate { get; set; }
         public DateTime StartDate { get; set; }
         public int Department { get; set; }
         public int Roles { get; set; }
+    }
+
+    public class EmployeeDetailViewModel
+    {
+        public int Id { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string? TCKN { get; set; }
+        public int CardID { get; set; }
+        public DateTime BirthDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public string DepartmentName { get; set; } = string.Empty;
+        public string RolesName { get; set; } = string.Empty;
+        public List<EmployeeNoteItemViewModel> Notes { get; set; } = new();
+        public List<LeaveRequestItemViewModel> LeaveHistory { get; set; } = new();
+    }
+
+    public class EmployeeNoteItemViewModel
+    {
+        public int Id { get; set; }
+        public string NoteText { get; set; } = string.Empty;
+        public string? CreatedByUserName { get; set; }
+        public DateTime CreatedTime { get; set; }
+    }
+
+    public class LeaveRequestItemViewModel
+    {
+        public int Id { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int Type { get; set; }
+        public int Status { get; set; }
+        public string Description { get; set; } = string.Empty;
     }
 }

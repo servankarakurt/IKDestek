@@ -1,4 +1,4 @@
-﻿@model List<HRSupport.UI.Models.InternViewModel>
+@model List<HRSupport.UI.Models.InternViewModel>
 @{ ViewData["Title"] = "Stajyer Yönetimi"; }
 
 <div class="container-fluid py-4">
@@ -69,6 +69,9 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Detail" asp-controller="Intern" asp-route-id="@intern.Id" class="btn btn-outline-info" title="Detay">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <a asp-action="Edit" asp-controller="Intern" asp-route-id="@intern.Id" class="btn btn-outline-primary" title="Düzenle">
                                             <i class="bi bi-pencil"></i>
                                         </a>

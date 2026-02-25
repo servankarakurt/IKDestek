@@ -12,14 +12,61 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <style>
-        body { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); }
-        .login-card { max-width: 400px; border-radius: 1rem; box-shadow: 0 1rem 3rem rgba(0,0,0,.2); }
-        .btn-primary { background: linear-gradient(135deg, #1e3a5f, #2d5a87); border: none; }
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(160deg, #e2e8f0 0%, #f1f5f9 40%, #f8fafc 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-card {
+            max-width: 400px;
+            border-radius: 1rem;
+            box-shadow: 0 4px 24px rgba(51, 65, 85, 0.12);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            overflow: hidden;
+        }
+        .login-card .card-header {
+            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+            color: #f8fafc;
+            border: none;
+            padding: 1.25rem 1.5rem;
+        }
+        .login-card .card-header small {
+            color: #cbd5e1;
+            font-size: 0.875rem;
+        }
+        .login-card .card-body {
+            background: #fff;
+            padding: 1.5rem 1.75rem;
+        }
+        .login-card .form-control {
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5e1;
+            padding: 0.6rem 0.85rem;
+        }
+        .login-card .form-control:focus {
+            border-color: #64748b;
+            box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.2);
+        }
+        .login-card .btn-primary {
+            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.6rem 1rem;
+            font-weight: 600;
+        }
+        .login-card .btn-primary:hover {
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);
+        }
     </style>
 </head>
 <body>
     <div class="card login-card">
-        <div class="card-header bg-dark text-white text-center py-4 rounded-top">
+        <div class="card-header text-center">
             <h4 class="mb-0"><i class="bi bi-shield-lock me-2"></i>HRSupport</h4>
             <small>E-posta ve şifre ile giriş yapın</small>
         </div>

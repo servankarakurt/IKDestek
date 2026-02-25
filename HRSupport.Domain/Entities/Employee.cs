@@ -17,6 +17,8 @@ namespace HRSupport.Domain.Entities
         public Roles Roles { get; set; }
         public string PasswordHash { get; set; } = string.Empty;
         public bool MustChangePassword { get; set; } = false;
+        /// <summary>TC Kimlik No (opsiyonel).</summary>
+        public string? TCKN { get; set; }
         public string FullName => $"{FirstName} {LastName}";
     }
 }

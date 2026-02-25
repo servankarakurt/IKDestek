@@ -15,5 +15,7 @@ namespace HRSupport.Application.DTOs
         // EKSİK OLAN VE EKLENMESİ GEREKEN ALANLAR:
         public LeaveType Type { get; set; }
         public bool IsUrgentWithoutBalance { get; set; }
+        /// <summary>Dashboard listesinde göstermek için (API tarafında doldurulur).</summary>
+        public string? EmployeeName { get; set; }
     }
 }

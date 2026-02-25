@@ -18,7 +18,19 @@ namespace HRSupport.Infrastructure.Repositories
         public async Task<EmployeeLeaveBalance?> GetByEmployeeIdAsync(int employeeId)
         {
             return await _context.EmployeeLeaveBalances
-                .FirstOrDefaultAsync(x => x.EmployeeId == employeeId);
+                .FirstOrDefaultAsync(x => x.EmployeeId == employeeId && !x.IsDeleted);
+        }
+
+        public async Task AddAsync(EmployeeLeaveBalance balance)
+        {
+            await _context.EmployeeLeaveBalances.AddAsync(balance);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(EmployeeLeaveBalance balance)
+        {
+            _context.EmployeeLeaveBalances.Update(balance);
+            await _context.SaveChangesAsync();
         }
     }
 }

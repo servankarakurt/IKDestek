@@ -7,7 +7,7 @@ namespace HRSupport.Application.DTOs
         public string Role { get; set; } = string.Empty;
         public int UserId { get; set; }
         public string FullName { get; set; } = string.Empty;
-        public string UserType { get; set; } = string.Empty; // "Employee" | "Intern"
+        public string UserType { get; set; } = string.Empty; 
         public bool MustChangePassword { get; set; }
     }
 }

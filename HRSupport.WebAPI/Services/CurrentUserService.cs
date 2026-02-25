@@ -21,6 +21,8 @@ namespace HRSupport.WebAPI.Services
             }
         }
 
+        public string? Email => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+
         public string? Role => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
 
         public int? DepartmentId

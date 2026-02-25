@@ -1,54 +1,171 @@
+@model HRSupport.UI.Models.DashboardStatsViewModel
 @{
-    ViewData["Title"] = "Giriş - İK Destek";
+    ViewData["Title"] = Model.IsManagerView ? "Yönetici Anasayfa" : "Anasayfa";
+    var isManager = Model.IsManagerView;
 }
 
-<link rel="stylesheet" href="~/css/landing.css" />
+<div class="container-fluid py-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-<div class="d-flex vh-100 align-items-center justify-content-center bg-light">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 text-center mb-4">
-                <h1 class="fw-bold">İK Destek</h1>
-                <p class="text-muted">Giriş yapmak için bir rol seçin</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            @if (isManager)
+            {
+                <text>Yönetici Paneli</text>
+                if (!string.IsNullOrEmpty(Model.ManagerDepartmentName))
+                {
+                    <span class="text-muted fs-5 fw-normal"> — @Model.ManagerDepartmentName</span>
+                }
+            }
+            else
+            {
+                <text>Genel Durum Özeti (İK Paneli)</text>
+            }
+        </h2>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow-sm h-100 border-0">
+                <div class="card-body text-center py-4">
+                    <h6 class="card-title text-white-50 mb-1">@(isManager ? "Birimimdeki Çalışan" : "Toplam Aktif Çalışan")</h6>
+                    <h2 class="display-5 fw-bold mb-0">@Model.TotalEmployees</h2>
+                </div>
             </div>
         </div>
-
-        <div class="row gy-4 justify-content-center landing-row">
+        @if (!isManager)
+        {
             <div class="col-md-3">
-                <div class="card shadow-sm h-100 text-center p-4 rounded-4 landing-card">
-                    <img src="/images/HR.jpg" alt="İK" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
-                    <h4 class="fw-bold">İK Girişi</h4>
-                    <p class="text-muted">Çalışan yönetimi, onaylar ve raporlar için İK paneline giriş yapın.</p>
-                    <a class="btn btn-primary mt-2 px-4" href="/Dashboard">Giriş Yap</a>
+                <div class="card text-white bg-info shadow-sm h-100 border-0">
+                    <div class="card-body text-center py-4">
+                        <h6 class="card-title text-white-50 mb-1">Aktif Stajyer</h6>
+                        <h2 class="display-5 fw-bold mb-0">@Model.TotalInterns</h2>
+                    </div>
                 </div>
             </div>
-
-            <div class="col-md-3">
-                <div class="card shadow-sm h-100 text-center p-4 rounded-4 landing-card">
-                    <img src="~/images/Manager.jpg" alt="Yönetici" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
-                    <h4 class="fw-bold">Yönetici Girişi</h4>
-                    <p class="text-muted">Ekip yönetimi ve izin onay süreçleri için yönetici paneline giriş yapın.</p>
-                    <a class="btn btn-info mt-2 px-4 text-white" href="/Dashboard">Giriş Yap</a>
+        }
+        <div class="col-md-3">
+            <div class="card text-white bg-warning shadow-sm h-100 border-0">
+                <div class="card-body text-center py-4">
+                    <h6 class="card-title text-dark mb-1">@(isManager ? "Birimimden Bekleyen İzin" : "Bekleyen İzin Talebi")</h6>
+                    <h2 class="display-5 fw-bold mb-0 text-dark">@Model.PendingLeaveRequests</h2>
                 </div>
             </div>
-
+        </div>
+        @if (!isManager)
+        {
             <div class="col-md-3">
-                <div class="card shadow-sm h-100 text-center p-4 rounded-4 landing-card">
-                    <img src="~/images/Employee.jpg" alt="Çalışan" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
-                    <h4 class="fw-bold">Çalışan Girişi</h4>
-                    <p class="text-muted">Personelinizin kendi hesaplarına erişmesi ve taleplerini yönetmesi için giriş.</p>
-                    <a class="btn btn-success mt-2 px-4" href="/EmployeePanel">Giriş Yap</a>
+                <div class="card text-white bg-success shadow-sm h-100 border-0">
+                    <div class="card-body text-center py-4">
+                        <h6 class="card-title text-white-50 mb-1">Onaylanan İzinler</h6>
+                        <h2 class="display-5 fw-bold mb-0">@Model.ApprovedLeaveRequests</h2>
+                    </div>
                 </div>
             </div>
+        }
+    </div>
 
-            <div class="col-md-3">
-                <div class="card shadow-sm h-100 text-center p-4 rounded-4 landing-card">
-                    <img src="~/images/Intern.jpg" alt="Stajyer" class="img-fluid mb-3" style="height:120px; object-fit:contain;" />
-                    <h4 class="fw-bold">Stajyer Girişi</h4>
-                    <p class="text-muted">Stajyerlerin başvuruları ve görevleri için özel erişim.</p>
-                    <a class="btn btn-warning mt-2 px-4 text-white" href="/EmployeePanel">Giriş Yap</a>
-                </div>
+    @if (Model.DepartmentBreakdown != null && Model.DepartmentBreakdown.Any())
+    {
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">@(isManager ? "Birimim" : "Departmanlara Göre Çalışan Sayısı")</h5>
             </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Departman</th>
+                            <th class="text-end">Çalışan Sayısı</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in Model.DepartmentBreakdown)
+                        {
+                            <tr>
+                                <td>@d.DepartmentName</td>
+                                <td class="text-end fw-semibold">@d.Count</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0">@(isManager ? "Birimimden Onay Bekleyen İzin Talepleri" : "Onay Bekleyen İzin Talepleri")</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Personel</th>
+                        <th>İzin Türü</th>
+                        <th>Başlangıç</th>
+                        <th>Bitiş</th>
+                        <th>Aksiyon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.RecentPendingRequests != null && Model.RecentPendingRequests.Any())
+                    {
+                        foreach (var item in Model.RecentPendingRequests)
+                        {
+                            var rowClass = item.IsUrgentWithoutBalance ? "table-danger fw-bold" : "";
+                            <tr class="@rowClass">
+                                <td>@(item.EmployeeName ?? item.EmployeeId.ToString())</td>
+                                <td>
+                                    @item.Type
+                                    @if (item.IsUrgentWithoutBalance)
+                                    {
+                                        <span class="badge bg-danger ms-1">Bakiye yetersiz (acil)</span>
+                                    }
+                                </td>
+                                <td>@item.StartDate.ToString("dd.MM.yyyy")</td>
+                                <td>@item.EndDate.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    <form asp-controller="Dashboard" asp-action="UpdateLeaveStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="leaveRequestId" value="@item.Id" />
+                                        <input type="hidden" name="newStatus" value="3" />
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Bu izni onaylamak istediğinize emin misiniz?');">Onayla</button>
+                                    </form>
+                                    <form asp-controller="Dashboard" asp-action="UpdateLeaveStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="leaveRequestId" value="@item.Id" />
+                                        <input type="hidden" name="newStatus" value="2" />
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bu izni reddetmek istediğinize emin misiniz?');">Reddet</button>
+                                    </form>
+                                    <form asp-controller="Dashboard" asp-action="UpdateLeaveStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="leaveRequestId" value="@item.Id" />
+                                        <input type="hidden" name="newStatus" value="4" />
+                                        <button type="submit" class="btn btn-sm btn-warning text-white" onclick="return confirm('Revizyon istemek istediğinize emin misiniz?');">Revizyon İste</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">Bekleyen izin talebi bulunmuyor.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

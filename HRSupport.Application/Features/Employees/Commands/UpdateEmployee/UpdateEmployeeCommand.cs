@@ -18,5 +18,6 @@ namespace HRSupport.Application.Features.Employees.Commands
         public DateTime StartDate { get; set; }
         public Department Department { get; set; }
         public Roles Roles { get; set; }
+        public string? TCKN { get; set; }
     }
 }

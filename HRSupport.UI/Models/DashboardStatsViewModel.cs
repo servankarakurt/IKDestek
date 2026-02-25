@@ -1,4 +1,4 @@
-﻿using HRSupport.Application.DTOs;
+using HRSupport.Application.DTOs;
 
 namespace HRSupport.UI.Models
 {
@@ -10,6 +10,16 @@ namespace HRSupport.UI.Models
         public int PendingLeaveRequests { get; set; }
         public int ApprovedLeaveRequests { get; set; }
         public List<LeaveRequestDto> RecentPendingRequests { get; set; } = new List<LeaveRequestDto>();
+        public List<DepartmentCountViewModel> DepartmentBreakdown { get; set; } = new List<DepartmentCountViewModel>();
+        public bool IsManagerView { get; set; }
+        public string? ManagerDepartmentName { get; set; }
+    }
+
+    public class DepartmentCountViewModel
+    {
+        public int DepartmentId { get; set; }
+        public string DepartmentName { get; set; } = string.Empty;
+        public int Count { get; set; }
     }
 
     // API'mizin Result<T> yapısını karşılamak için sarmalayıcı sınıf

@@ -36,6 +36,7 @@ namespace HRSupport.Application.Features.Employees.Commands
             // Hem Employee entity'sinde hem de Command'da artık isim 'Department'
             existingEmployee.Department = request.Department;
             existingEmployee.Roles = request.Roles;
+            existingEmployee.TCKN = request.TCKN;
 
             await _employeeRepository.UpdateAsync(existingEmployee);
 

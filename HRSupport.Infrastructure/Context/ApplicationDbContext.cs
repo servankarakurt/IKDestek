@@ -18,6 +18,9 @@ namespace HRSupport.Infrastructure.Context
         public DbSet<LeaveApprovalHistory> LeaveApprovalHistories { get; set; }
         public DbSet<EmployeeLeaveBalance> EmployeeLeaveBalances { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<EmployeeNote> EmployeeNotes { get; set; }
+        public DbSet<InternTask> InternTasks { get; set; }
+        public DbSet<MentorNote> MentorNotes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +39,13 @@ namespace HRSupport.Infrastructure.Context
             modelBuilder.Entity<LeaveRequest>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Intern>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<EmployeeLeaveBalance>().ToTable("EmployeeLeaveBalances");
+
+            modelBuilder.Entity<EmployeeNote>().ToTable("EmployeeNotes");
+            modelBuilder.Entity<EmployeeNote>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<InternTask>().ToTable("InternTasks");
+            modelBuilder.Entity<InternTask>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<MentorNote>().ToTable("MentorNotes");
+            modelBuilder.Entity<MentorNote>().HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

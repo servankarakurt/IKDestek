@@ -22,8 +22,21 @@ namespace HRSupport.Application.Features.LeaveRequests.Queries
             if (!_currentUser.UserId.HasValue)
                 return Result<int>.Failure("Oturum bulunamadı.");
 
-            var balance = await _balanceRepository.GetByEmployeeIdAsync(_currentUser.UserId.Value);
-            return Result<int>.Success(balance?.RemainingAnnualLeaveDays ?? 0, "Kalan izin günü getirildi.");
+            var userId = _currentUser.UserId.Value;
+            var balance = await _balanceRepository.GetByEmployeeIdAsync(userId);
+
+            if (balance == null)
+            {
+                var newBalance = new Domain.Entities.EmployeeLeaveBalance
+                {
+                    EmployeeId = userId,
+                    RemainingAnnualLeaveDays = 20
+                };
+                await _balanceRepository.AddAsync(newBalance);
+                return Result<int>.Success(20, "Kalan izin günü getirildi.");
+            }
+
+            return Result<int>.Success(balance.RemainingAnnualLeaveDays, "Kalan izin günü getirildi.");
         }
     }
 }

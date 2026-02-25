@@ -1,4 +1,4 @@
-﻿@model HRSupport.UI.Models.CreateInternViewModel
+@model HRSupport.UI.Models.CreateInternViewModel
 
 @{
     ViewData["Title"] = "Yeni Stajyer Ekle";
@@ -76,8 +76,10 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-floating">
-                                    <input asp-for="MentorId" type="number" class="form-control rounded-3" placeholder="Mentor ID" />
-                                    <label asp-for="MentorId">Mentor ID (Opsiyonel)</label>
+                                    <select asp-for="MentorId" class="form-select rounded-3" asp-items="ViewBag.Mentors">
+                                        <option value="">Mentor seçiniz (opsiyonel)</option>
+                                    </select>
+                                    <label asp-for="MentorId">Mentor (Personel)</label>
                                 </div>
                             </div>
                         </div>

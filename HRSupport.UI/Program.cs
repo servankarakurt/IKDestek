@@ -11,7 +11,12 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<BearerTokenHandler>();
-builder.Services.AddHttpClient("ApiWithAuth")
+var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') ?? "http://localhost:5107";
+builder.Services.AddHttpClient("ApiWithAuth", c =>
+{
+    c.BaseAddress = new Uri(apiBaseUrl + "/");
+    c.Timeout = TimeSpan.FromSeconds(30);
+})
     .AddHttpMessageHandler<BearerTokenHandler>();
 
 builder.Services.AddSession(options =>
@@ -20,6 +25,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+// #region agent log
+try { var logPath = Path.Combine(Directory.GetCurrentDirectory(), "debug-6a60d2.log"); File.AppendAllText(logPath, "{\"sessionId\":\"6a60d2\",\"message\":\"UI started\",\"timestamp\":" + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + "}\n"); } catch { }
+// #endregion
+
 
 var app = builder.Build();
 

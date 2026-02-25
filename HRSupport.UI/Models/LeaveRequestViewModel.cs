@@ -52,6 +52,15 @@ namespace HRSupport.UI.Models
         public int Status { get; set; } // Onay/Red durumunu değiştirebilmek için
     }
 
+    /// <summary>Print sayfasında stajyer bilgisini doldurmak için (API /api/Intern/{id} yanıtı).</summary>
+    public class InternPrintViewModel
+    {
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+    }
+
     /// <summary>
     /// İzin formu yazdırma sayfası için model (Yıllık Ücretli İzin Formu).
     /// </summary>
