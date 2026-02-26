@@ -1,5 +1,7 @@
 @model List<HRSupport.UI.Models.EmployeeViewModel>
 @{ ViewData["Title"] = "Çalışan Yönetimi"; }
+@* Silme isteği için anti-forgery token (sayfada her zaman bulunsun) *@
+<div id="antiForgeryContainer" style="display:none;">@Html.AntiForgeryToken()</div>
 
 <div class="container-fluid py-4">
     @if (!ViewData.ModelState.IsValid)
@@ -143,26 +145,34 @@
 @section Scripts {
     <script>
         function deleteEmployee(id) {
-            if (!confirm("Bu personeli silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;
-            fetch('/Employee/Delete/' + id, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Başarılıysa sayfayı yenile
-                        location.reload();
-                    } else {
-                        // Başarısızsa hata mesajı göster
-                        alert(data.message);
-                    }
+            if (!confirm("Bu personeli listeden kaldırmak istediğinize emin misiniz?\n\nEvet derseniz kişi \"silindi\" işaretlenecek ve listede görünmeyecek.")) return;
+
+            var tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+            var token = tokenEl ? tokenEl.value : '';
+            var headers = { 'Content-Type': 'application/json' };
+            if (token) headers['RequestVerificationToken'] = token;
+
+            fetch('/Employee/Delete/' + id, { method: 'POST', headers: headers })
+                .then(function (response) {
+                    return response.text().then(function (text) {
+                        var data = null;
+                        try { data = JSON.parse(text); } catch (e) { }
+                        return { ok: response.ok, status: response.status, data: data, raw: text };
+                    });
                 })
-                .catch(error => {
+                .then(function (result) {
+                    if (result.ok && result.data && result.data.success) {
+                        location.reload();
+                        return;
+                    }
+                    var msg = (result.data && result.data.message) ? result.data.message : "Silme işlemi başarısız oldu.";
+                    if (!result.ok && result.data && result.data.error) msg = result.data.error;
+                    alert(msg);
+                })
+                .catch(function (error) {
                     console.error('Hata:', error);
                     alert("Silme işlemi sırasında sunucu ile bağlantı kurulamadı.");
                 });
-            }
         }
     </script>
 }

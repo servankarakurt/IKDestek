@@ -231,10 +231,24 @@ namespace HRSupport.UI.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return Json(new { success = true, message = "Personel başarıyla silindi." });
+                    return Json(new { success = true, message = "Personel listeden kaldırıldı. Liste güncellendi." });
                 }
 
-                return Json(new { success = false, message = "Silme işlemi başarısız oldu." });
+                var body = await response.Content.ReadAsStringAsync();
+                var apiMessage = "Silme işlemi başarısız oldu.";
+                if (!string.IsNullOrWhiteSpace(body))
+                {
+                    try
+                    {
+                        var json = System.Text.Json.JsonDocument.Parse(body);
+                        if (json.RootElement.TryGetProperty("error", out var err) && err.ValueKind == System.Text.Json.JsonValueKind.String)
+                            apiMessage = err.GetString() ?? apiMessage;
+                        else if (json.RootElement.TryGetProperty("Error", out var err2) && err2.ValueKind == System.Text.Json.JsonValueKind.String)
+                            apiMessage = err2.GetString() ?? apiMessage;
+                    }
+                    catch { /* ham mesajı kullan */ }
+                }
+                return Json(new { success = false, message = apiMessage });
             }
             catch (Exception ex)
             {
