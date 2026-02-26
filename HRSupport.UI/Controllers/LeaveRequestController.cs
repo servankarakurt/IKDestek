@@ -142,98 +142,22 @@ namespace HRSupport.UI.Controllers
 
         /// <summary>
         /// İzin talebi için yıllık ücretli izin formu yazdırma sayfası.
-        /// Personel (Employee) veya Stajyer (Intern) izin kaydı için çalışır; Stajyer talebinde EmployeeId = Intern.Id olabilir.
+        /// Tek API çağrısı (print-info) ile çalışır; personel (Çalışan/Stajyer) kendi iznini yazdırabilir.
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> Print(int id)
         {
             var client = _httpClientFactory.CreateClient("ApiWithAuth");
-            var baseUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/');
+            var baseUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') ?? "";
             var jsonOpt = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-            var leaveResp = await client.GetAsync(baseUrl + $"/api/LeaveRequest/{id}");
-            if (!leaveResp.IsSuccessStatusCode)
+            var response = await client.GetAsync(baseUrl + $"/api/LeaveRequest/{id}/print-info");
+            if (!response.IsSuccessStatusCode)
+                return NotFound("İzin talebi bulunamadı veya yazdırma yetkiniz yok.");
+            var result = await response.Content.ReadFromJsonAsync<ApiResult<LeaveRequestPrintViewModel>>(jsonOpt);
+            if (result?.Value == null)
                 return NotFound("İzin talebi bulunamadı.");
-            var leaveResult = await leaveResp.Content.ReadFromJsonAsync<ApiResult<UpdateLeaveRequestViewModel>>(jsonOpt);
-            if (leaveResult?.Value == null)
-                return NotFound("İzin talebi bulunamadı.");
-            var leave = leaveResult.Value;
-            var days = (leave.EndDate - leave.StartDate).Days + 1;
-
-            // Önce Personel (Employee) olarak dene; Stajyer izinlerinde EmployeeId = Intern.Id olduğu için 404 gelirse Stajyer dene
-            var empResp = await client.GetAsync(baseUrl + $"/api/Employee/{leave.EmployeeId}");
-            if (empResp.IsSuccessStatusCode)
-            {
-                var empResult = await empResp.Content.ReadFromJsonAsync<ApiResult<UpdateEmployeeViewModel>>(jsonOpt);
-                if (empResult?.Value != null)
-                {
-                    var emp = empResult.Value;
-                    var printModel = new LeaveRequestPrintViewModel
-                    {
-                        FormPrintDate = DateTime.Now,
-                        EmployeeName = $"{emp.FirstName} {emp.LastName}".Trim(),
-                        Kurum = "Hepiyi Sigorta",
-                        Sirket = "Hepiyi Sigorta A.Ş.",
-                        DepartmentName = GetDepartmentName(emp.Department),
-                        Unvan = "",
-                        SicilNo = emp.CardID,
-                        LeaveYear = leave.StartDate.Year,
-                        StartDate = leave.StartDate,
-                        EndDate = leave.EndDate,
-                        RequestedDays = days,
-                        AddressAndPhone = leave.Description ?? "",
-                        EmployeeStartDate = emp.StartDate,
-                        KullanilanIzinGunuDisplay = days.ToString(System.Globalization.CultureInfo.GetCultureInfo("tr-TR"))
-                    };
-                    return View(printModel);
-                }
-            }
-
-            // Stajyer izin talebi: çalışan bulunamadıysa aynı id ile Intern al
-            var internResp = await client.GetAsync(baseUrl + $"/api/Intern/{leave.EmployeeId}");
-            if (internResp.IsSuccessStatusCode)
-            {
-                var internResult = await internResp.Content.ReadFromJsonAsync<ApiResult<InternPrintViewModel>>(jsonOpt);
-                if (internResult?.Value != null)
-                {
-                    var intern = internResult.Value;
-                    var printModel = new LeaveRequestPrintViewModel
-                    {
-                        FormPrintDate = DateTime.Now,
-                        EmployeeName = intern.FullName?.Trim() ?? $"{intern.FirstName} {intern.LastName}".Trim(),
-                        Kurum = "Hepiyi Sigorta",
-                        Sirket = "Hepiyi Sigorta A.Ş.",
-                        DepartmentName = "Stajyer",
-                        Unvan = "",
-                        SicilNo = 0,
-                        LeaveYear = leave.StartDate.Year,
-                        StartDate = leave.StartDate,
-                        EndDate = leave.EndDate,
-                        RequestedDays = days,
-                        AddressAndPhone = leave.Description ?? "",
-                        EmployeeStartDate = intern.StartDate,
-                        KullanilanIzinGunuDisplay = days.ToString(System.Globalization.CultureInfo.GetCultureInfo("tr-TR"))
-                    };
-                    return View(printModel);
-                }
-            }
-
-            return NotFound("Çalışan veya stajyer bilgisi bulunamadı.");
-        }
-
-        private static string GetDepartmentName(int department)
-        {
-            return department switch
-            {
-                1 => "Yazılım",
-                2 => "İnsan Kaynakları",
-                3 => "Satış",
-                4 => "Muhasebe",
-                5 => "Pazarlama",
-                6 => "Operasyon",
-                7 => "Acente",
-                _ => ""
-            };
+            return View(result.Value);
         }
     }
 }

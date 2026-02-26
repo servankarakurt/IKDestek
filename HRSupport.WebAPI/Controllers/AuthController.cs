@@ -53,5 +53,27 @@ namespace HRSupport.WebAPI.Controllers
                 _logger.LogWarning("Login başarısız: {Error}", result.Error);
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
+
+        /// <summary>Giriş yapmış kullanıcı kendi şifresini değiştirir (geçici şifre sonrası zorunlu değişiklik dahil).</summary>
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand? command)
+        {
+            if (command == null)
+                return BadRequest(Result<bool>.Failure("Mevcut şifre ve yeni şifre gerekli."));
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
+
+        /// <summary>Admin/IK: E-posta ile kullanıcı şifresini geçici şifre ile sıfırlar. Yeni geçici şifre döner.</summary>
+        [HttpPost("reset-password")]
+        [Authorize(Roles = "Admin,IK")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand? command)
+        {
+            if (command == null || string.IsNullOrWhiteSpace(command.Email))
+                return BadRequest(Result<string>.Failure("E-posta adresi gerekli."));
+            var result = await _mediator.Send(command);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
     }
 }

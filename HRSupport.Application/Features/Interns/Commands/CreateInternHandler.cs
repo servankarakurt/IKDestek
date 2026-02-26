@@ -4,8 +4,6 @@ using HRSupport.Application.Interfaces;
 using HRSupport.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace HRSupport.Application.Features.Interns.Commands
 {
@@ -37,7 +35,7 @@ namespace HRSupport.Application.Features.Interns.Commands
                 intern.Email = intern.Email.Trim().ToLowerInvariant();
 
             // Geçici şifre: sadece alfanumerik (kopyala-yapıştır ve giriş sorunlarını önlemek için)
-            var tempPassword = GenerateTemporaryPassword(10);
+            var tempPassword = PasswordHelper.GenerateTemporaryPassword(10);
             intern.PasswordHash = PasswordHelper.Hash(tempPassword);
             intern.MustChangePassword = true;
 
@@ -53,22 +51,6 @@ namespace HRSupport.Application.Features.Interns.Commands
 
             var message = $"Geçici şifre: {tempPassword}. Kullanıcı ilk girişte değiştirmelidir.";
             return Result<int>.Success(internId, message);
-        }
-
-        private static string GenerateTemporaryPassword(int length = 10)
-        {
-            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var sb = new StringBuilder();
-            using var rng = RandomNumberGenerator.Create();
-            var buffer = new byte[4];
-            while (sb.Length < length)
-            {
-                rng.GetBytes(buffer);
-                var num = BitConverter.ToUInt32(buffer, 0);
-                var idx = (int)(num % (uint)chars.Length);
-                sb.Append(chars[idx]);
-            }
-            return sb.ToString();
         }
 
     }

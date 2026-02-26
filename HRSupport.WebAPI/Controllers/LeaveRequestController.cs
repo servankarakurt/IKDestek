@@ -47,6 +47,14 @@ namespace HRSupport.WebAPI.Controllers
             return result.IsSuccess ? Ok(result) : NotFound(result);
         }
 
+        /// <summary>İzin formu yazdırma için gerekli bilgiler. Personel kendi iznini yazdırabilir.</summary>
+        [HttpGet("{id}/print-info")]
+        public async Task<IActionResult> GetPrintInfo(int id)
+        {
+            var result = await _mediator.Send(new GetLeaveRequestPrintInfoQuery(id));
+            return result.IsSuccess ? Ok(result) : NotFound(result);
+        }
+
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] UpdateLeaveRequestCommand command)
         {

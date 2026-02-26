@@ -21,5 +21,16 @@ namespace HRSupport.Infrastructure.Repositories
             return await _context.Users
                 .FirstOrDefaultAsync(x => x.Email != null && x.Email.Trim().ToLower() == normalized);
         }
+
+        public async Task<User?> GetByIdAsync(int id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+        }
+
+        public async Task UpdateAsync(User user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
     }
 }

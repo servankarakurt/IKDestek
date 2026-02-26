@@ -4,8 +4,6 @@ using HRSupport.Application.Interfaces;
 using HRSupport.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace HRSupport.Application.Features.Employees.Commands
 {
@@ -37,7 +35,7 @@ namespace HRSupport.Application.Features.Employees.Commands
                 employee.Email = employee.Email.Trim().ToLowerInvariant();
 
             // Geçici şifre: sadece alfanumerik (kopyala-yapıştır ve HTML kaçış sorunlarını önlemek için)
-            var tempPassword = GenerateTemporaryPassword(10);
+            var tempPassword = PasswordHelper.GenerateTemporaryPassword(10);
             employee.PasswordHash = PasswordHelper.Hash(tempPassword);
             employee.MustChangePassword = true;
 
@@ -54,23 +52,6 @@ namespace HRSupport.Application.Features.Employees.Commands
             // Return the temporary password in the result message so the UI can show it to the admin
             var message = $"Geçici şifre: {tempPassword}. Kullanıcı ilk girişte değiştirmelidir.";
             return Result<int>.Success(employeeId, message);
-        }
-
-        private static string GenerateTemporaryPassword(int length = 10)
-        {
-            // Sadece alfanumerik: kopyala-yapıştır ve girişte karakter kaybı olmaması için
-            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var sb = new StringBuilder();
-            using var rng = RandomNumberGenerator.Create();
-            var buffer = new byte[4];
-            while (sb.Length < length)
-            {
-                rng.GetBytes(buffer);
-                var num = BitConverter.ToUInt32(buffer, 0);
-                var idx = (int)(num % (uint)chars.Length);
-                sb.Append(chars[idx]);
-            }
-            return sb.ToString();
         }
 
     }

@@ -1,12 +1,14 @@
 namespace HRSupport.UI.Models
 {
-    /// <summary>Stajyer paneli: kalan gün, son 5 talep, tüm talepler, mentor bilgisi.</summary>
+    /// <summary>Stajyer paneli: kalan gün, son 5 talep, tüm talepler, mentor bilgisi, bana verilen görevler.</summary>
     public class StajyerPanelViewModel
     {
         public int KalanIzinGunu { get; set; }
         public List<LeaveRequestViewModel> SonBesTalep { get; set; } = new();
         public List<LeaveRequestViewModel> Taleplerim { get; set; } = new();
         public MentorInfoViewModel? Mentor { get; set; }
+        /// <summary>Mentor tarafından stajyere verilen görevler (panelde belirgin gösterilir).</summary>
+        public List<InternTaskItemViewModel> Gorevlerim { get; set; } = new();
     }
 
     /// <summary>Çalışan paneli: izin bilgileri + birim arkadaşları + mentee listesi.</summary>

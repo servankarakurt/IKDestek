@@ -25,6 +25,8 @@ namespace HRSupport.WebAPI.Services
 
         public string? Role => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
 
+        public string? UserType => _httpContextAccessor.HttpContext?.User?.FindFirstValue("user_type");
+
         public int? DepartmentId
         {
             get

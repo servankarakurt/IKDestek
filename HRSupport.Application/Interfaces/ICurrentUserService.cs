@@ -5,6 +5,7 @@ namespace HRSupport.Application.Interfaces
         int? UserId { get; }
         string? Email { get; }
         string? Role { get; }
+        string? UserType { get; }
         int? DepartmentId { get; }
         bool IsAuthenticated { get; }
     }

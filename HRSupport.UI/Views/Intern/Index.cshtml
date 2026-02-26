@@ -24,6 +24,13 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
     <div class="card shadow-sm border-0">
         <div class="table-responsive">
@@ -75,6 +82,13 @@
                                         <a asp-action="Edit" asp-controller="Intern" asp-route-id="@intern.Id" class="btn btn-outline-primary" title="Düzenle">
                                             <i class="bi bi-pencil"></i>
                                         </a>
+                                        <form method="post" asp-action="ResetPassword" asp-controller="Intern" class="d-inline" onsubmit="return confirm('Bu stajyerin şifresi yeni bir geçici şifre ile sıfırlanacak. Devam?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="email" value="@intern.Email" />
+                                            <button type="submit" class="btn btn-outline-secondary" title="Şifre sıfırla">
+                                                <i class="bi bi-key"></i>
+                                            </button>
+                                        </form>
                                         <a href="#" class="btn btn-outline-danger" title="Sil">
                                             <i class="bi bi-trash"></i>
                                         </a>

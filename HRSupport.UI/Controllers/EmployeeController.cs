@@ -143,6 +143,33 @@ namespace HRSupport.UI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(string email)
+        {
+            var role = HttpContext.Session.GetString("Role") ?? "";
+            if (role != "Admin" && role != "IK")
+                return RedirectToAction(nameof(Index));
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                TempData["ErrorMessage"] = "E-posta adresi gerekli.";
+                return RedirectToAction(nameof(Index));
+            }
+            var client = _httpClientFactory.CreateClient();
+            var request = CreateRequest(HttpMethod.Post, "/api/Auth/reset-password", System.Net.Http.Json.JsonContent.Create(new { email = email.Trim() }));
+            var response = await client.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
+            var opt = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var result = System.Text.Json.JsonSerializer.Deserialize<ApiResult<string>>(json, opt);
+            if (response.IsSuccessStatusCode && result?.IsSuccess == true && !string.IsNullOrEmpty(result.Value))
+            {
+                TempData["TempPasswordInfo"] = $"Şifre sıfırlandı. Yeni geçici şifre: {result.Value} — Kullanıcıya iletin, ilk girişte değiştirmesi istenecektir.";
+                return RedirectToAction(nameof(Index));
+            }
+            TempData["ErrorMessage"] = result?.Error ?? "Şifre sıfırlanamadı.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNote(int employeeId, string noteText)
         {
             if (IsCalisan()) return RedirectToAction("Index", "PersonelPanel");

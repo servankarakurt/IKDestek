@@ -51,6 +51,63 @@
         </div>
     </div>
 
+    <div class="card border-0 shadow-sm mt-4 border-primary border-2">
+        <div class="card-header bg-light text-dark">
+            <strong><i class="bi bi-list-check"></i> Bana Verilen Görevler</strong>
+        </div>
+        <div class="card-body p-0">
+            @if (Model.Gorevlerim?.Count > 0)
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var g in Model.Gorevlerim)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-start flex-wrap gap-2" data-task-id="@g.Id">
+                            <div class="flex-grow-1">
+                                <strong>@g.Title</strong>
+                                @if (!string.IsNullOrEmpty(g.Description))
+                                {
+                                    <span class="text-muted"> — @g.Description</span>
+                                }
+                                <br /><small class="text-muted">@g.CreatedTime.ToString("dd.MM.yyyy")</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                @if (g.IsCompleted)
+                                {
+                                    <span class="badge bg-success">Tamamlandı</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark task-status">Devam ediyor</span>
+                                    <label class="btn btn-sm btn-outline-primary mb-0">
+                                        <i class="bi bi-file-earmark-pdf"></i> PDF yükle
+                                        <input type="file" accept=".pdf" class="d-none task-pdf-upload" />
+                                    </label>
+                                }
+                            </div>
+                        </li>
+                    }
+                </ul>
+                <script>
+                    document.querySelectorAll('.task-pdf-upload').forEach(function (input) {
+                        input.addEventListener('change', function () {
+                            if (this.files && this.files.length > 0) {
+                                var row = this.closest('li');
+                                var status = row.querySelector('.task-status');
+                                var label = row.querySelector('label.btn');
+                                if (status) { status.textContent = 'Tamamlandı'; status.className = 'badge bg-success task-status'; }
+                                if (label) label.remove();
+                            }
+                        });
+                    });
+                </script>
+            }
+            else
+            {
+                <p class="text-muted text-center py-4 mb-0">Mentorünüz tarafından henüz görev verilmedi.</p>
+            }
+        </div>
+    </div>
+
     <div class="card border-0 shadow-sm mt-4">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
             <strong><i class="bi bi-clock-history"></i> Son 5 İzin Talebim</strong>

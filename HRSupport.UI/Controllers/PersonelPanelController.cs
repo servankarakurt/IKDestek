@@ -44,6 +44,7 @@ namespace HRSupport.UI.Controllers
         private async Task<IActionResult> StajyerPanel()
         {
             var model = new StajyerPanelViewModel();
+            var userId = HttpContext.Session.GetInt32("UserId");
             try
             {
                 var balanceRes = await SendWithTokenAsync(HttpMethod.Get, BaseUrl + "/api/LeaveRequest/my-balance");
@@ -67,6 +68,17 @@ namespace HRSupport.UI.Controllers
                 {
                     var mentorResult = await mentorRes.Content.ReadFromJsonAsync<ApiResult<MentorInfoViewModel>>(JsonOptions);
                     model.Mentor = mentorResult?.Value;
+                }
+
+                if (userId.HasValue)
+                {
+                    var detailRes = await SendWithTokenAsync(HttpMethod.Get, BaseUrl + $"/api/Intern/{userId.Value}/detail");
+                    if (detailRes.IsSuccessStatusCode)
+                    {
+                        var detailResult = await detailRes.Content.ReadFromJsonAsync<ApiResult<InternDetailViewModel>>(JsonOptions);
+                        if (detailResult?.Value?.Tasks != null)
+                            model.Gorevlerim = detailResult.Value.Tasks;
+                    }
                 }
             }
             catch

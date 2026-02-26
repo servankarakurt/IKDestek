@@ -10,6 +10,23 @@ namespace HRSupport.Application.Common
     /// </summary>
     public static class PasswordHelper
     {
+        /// <summary>Alfanumerik geçici şifre üretir (kopyala-yapıştır güvenli).</summary>
+        public static string GenerateTemporaryPassword(int length = 10)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var sb = new StringBuilder();
+            using var rng = RandomNumberGenerator.Create();
+            var buffer = new byte[4];
+            while (sb.Length < length)
+            {
+                rng.GetBytes(buffer);
+                var num = BitConverter.ToUInt32(buffer, 0);
+                var idx = (int)(num % (uint)chars.Length);
+                sb.Append(chars[idx]);
+            }
+            return sb.ToString();
+        }
+
         public static string Hash(string password)
         {
             if (string.IsNullOrEmpty(password)) return string.Empty;

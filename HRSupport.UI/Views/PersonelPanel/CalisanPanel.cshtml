@@ -118,6 +118,7 @@
                                 <tr>
                                     <th>Ad Soyad</th>
                                     <th>E-posta</th>
+                                    <th class="text-end">İşlem</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -126,6 +127,11 @@
                                     <tr>
                                         <td>@m.FullName</td>
                                         <td><a href="mailto:@m.Email">@m.Email</a></td>
+                                        <td class="text-end">
+                                            <a asp-controller="Intern" asp-action="Detail" asp-route-id="@m.Id" class="btn btn-sm btn-success" title="Görev ver, not ekle">
+                                                <i class="bi bi-list-task me-1"></i>Görev ver
+                                            </a>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>

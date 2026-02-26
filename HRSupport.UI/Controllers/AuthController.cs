@@ -80,6 +80,9 @@ namespace HRSupport.UI.Controllers
                 HttpContext.Session.SetString("FullName", data.FullName ?? "");
                 HttpContext.Session.SetString("UserType", data.UserType ?? "");
 
+                if (data.MustChangePassword)
+                    return RedirectToAction("ChangePassword");
+
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     return Redirect(returnUrl);
                 var role = data.Role ?? "";
@@ -89,6 +92,47 @@ namespace HRSupport.UI.Controllers
             }
 
             ModelState.AddModelError("", result?.Error ?? "Giriş başarısız. E-posta veya şifreyi kontrol edin.");
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+                return RedirectToAction("Login");
+            return View(new ChangePasswordViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+                return RedirectToAction("Login");
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var baseUrl = _configuration["ApiSettings:BaseUrl"]?.TrimEnd('/') ?? "";
+            using var client = _httpClientFactory.CreateClient("ApiWithAuth");
+            var response = await client.PostAsJsonAsync(new Uri(baseUrl + "/api/Auth/change-password"), new { model.CurrentPassword, model.NewPassword });
+
+            var json = await response.Content.ReadAsStringAsync();
+            var result = System.Text.Json.JsonSerializer.Deserialize<ApiResult<bool>>(json,
+                new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            if (response.IsSuccessStatusCode && result?.IsSuccess == true)
+            {
+                TempData["SuccessMessage"] = result.Error ?? "Şifreniz güncellendi.";
+                return RedirectToAction("Index", HttpContext.Session.GetString("Role") == "Çalışan" || HttpContext.Session.GetString("Role") == "Stajyer" ? "PersonelPanel" : "Home");
+            }
+
+            ModelState.AddModelError("", result?.Error ?? "Şifre güncellenemedi.");
             return View(model);
         }
 
