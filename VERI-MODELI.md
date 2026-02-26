@@ -13,7 +13,7 @@ Aşağıda ana tablolar ve ilişkiler özetlenmiştir. Tam şema için EF Core m
 | **LeaveApprovalHistory** | İzin onay/red geçmişi. LeaveRequestId, ProcessedByUserId, Action, Comments, ActionDate. |
 | **EmployeeLeaveBalances** | Çalışan yıllık izin bakiyesi. EmployeeId, RemainingAnnualLeaveDays. |
 | **EmployeeNotes** | Çalışana ait notlar (HR/Yönetici). EmployeeId, NoteText, CreatedByUserId, CreatedByUserName. |
-| **InternTasks** | Stajyere verilen görevler. InternId, Title, Description, IsCompleted. |
+| **InternTasks** | Employee'dan -->Stajyere verilen görevler. InternId, Title, Description, IsCompleted. |
 | **MentorNotes** | Mentor geri bildirim notları. InternId, MentorId (opsiyonel), NoteText, NoteDate. |
 
 ## Ortak Alanlar (BaseEntity)
