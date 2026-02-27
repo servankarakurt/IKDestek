@@ -232,6 +232,8 @@ _pkginfo.txt
 # Others
 ClientBin/
 ~$*
+# HttpClient / .NET runtime artifacts (proje kökünde oluşabilir)
+System.Net.Http.HttpClient.Default.LogicalHandler
 *~
 *.dbmdl
 *.dbproj.schemaview
