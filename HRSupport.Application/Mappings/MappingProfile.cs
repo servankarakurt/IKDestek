@@ -1,7 +1,7 @@
 using AutoMapper;
 using HRSupport.Application.DTOs;
 using HRSupport.Application.Features.Employees.Commands;
-using HRSupport.Application.Features.Interns.Commands;
+using HRSupport.Application.Features.Interns.Commands.CreateIntern;
 using HRSupport.Domain.Entities;
 
 namespace HRSupport.Application.Mappings

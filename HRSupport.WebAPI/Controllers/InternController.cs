@@ -1,5 +1,13 @@
-using HRSupport.Application.Features.Interns.Commands;
-using HRSupport.Application.Features.Interns.Queries;
+using HRSupport.Application.Features.Interns.Commands.AddInternTask;
+using HRSupport.Application.Features.Interns.Commands.AddMentorNote;
+using HRSupport.Application.Features.Interns.Commands.CreateIntern;
+using HRSupport.Application.Features.Interns.Commands.DeleteIntern;
+using HRSupport.Application.Features.Interns.Commands.UpdateIntern;
+using HRSupport.Application.Features.Interns.Queries.GetAllIntern;
+using HRSupport.Application.Features.Interns.Queries.GetInternById;
+using HRSupport.Application.Features.Interns.Queries.GetInternDetail;
+using HRSupport.Application.Features.Interns.Queries.GetMentees;
+using HRSupport.Application.Features.Interns.Queries.GetMyMentor;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

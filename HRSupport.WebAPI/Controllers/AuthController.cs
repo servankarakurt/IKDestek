@@ -1,6 +1,8 @@
 using HRSupport.Application.Common;
 using HRSupport.Application.DTOs;
 using HRSupport.Application.Features.Auth.Commands;
+using HRSupport.Application.Features.Auth.Commands.ChangePassword;
+using HRSupport.Application.Features.Auth.Commands.Login;
 using HRSupport.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

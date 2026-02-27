@@ -1,5 +1,9 @@
 using HRSupport.Application.Features.Employees.Commands;
-using HRSupport.Application.Features.Employees.Queries;
+using HRSupport.Application.Features.Employees.Queries.GetAllEmployess;
+using HRSupport.Application.Features.Employees.Queries.GetCollaeagues;
+using HRSupport.Application.Features.Employees.Queries.GetEmployeeById;
+using HRSupport.Application.Features.Employees.Queries.GetEmployeeDetail;
+
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
