@@ -21,6 +21,7 @@ namespace HRSupport.Infrastructure.Context
         public DbSet<EmployeeNote> EmployeeNotes { get; set; }
         public DbSet<InternTask> InternTasks { get; set; }
         public DbSet<MentorNote> MentorNotes { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,6 +47,7 @@ namespace HRSupport.Infrastructure.Context
             modelBuilder.Entity<InternTask>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<MentorNote>().ToTable("MentorNotes");
             modelBuilder.Entity<MentorNote>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<ActivityLog>().ToTable("ActivityLogs");
         }
     }
 }

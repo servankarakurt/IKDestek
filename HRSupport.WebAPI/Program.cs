@@ -1,7 +1,9 @@
+using HRSupport.Application.Common;
 using HRSupport.Application.Features.Employees.Commands;
 using HRSupport.Application.Interfaces;
 using HRSupport.Infrastructure.Context;
 using HRSupport.Infrastructure.Repositories;
+using HRSupport.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -40,9 +42,14 @@ builder.Services.AddScoped<IInternTaskRepository, InternTaskRepository>();
 builder.Services.AddScoped<IMentorNoteRepository, MentorNoteRepository>();
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateEmployeeCommand).Assembly));
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(CreateEmployeeCommand).Assembly);
+    cfg.AddOpenBehavior(typeof(ActivityLogBehavior<,>));
+});
 builder.Services.AddAutoMapper(typeof(HRSupport.Application.Mappings.MappingProfile).Assembly);
 
 var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();

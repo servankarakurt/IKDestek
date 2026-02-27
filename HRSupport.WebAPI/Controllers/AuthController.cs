@@ -1,6 +1,7 @@
 using HRSupport.Application.Common;
 using HRSupport.Application.DTOs;
 using HRSupport.Application.Features.Auth.Commands;
+using HRSupport.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -16,12 +17,14 @@ namespace HRSupport.WebAPI.Controllers
         private readonly IMediator _mediator;
         private readonly ILogger<AuthController> _logger;
         private readonly IWebHostEnvironment _env;
+        private readonly IActivityLogService _activityLog;
 
-        public AuthController(IMediator mediator, ILogger<AuthController> logger, IWebHostEnvironment env)
+        public AuthController(IMediator mediator, ILogger<AuthController> logger, IWebHostEnvironment env, IActivityLogService activityLog)
         {
             _mediator = mediator;
             _logger = logger;
             _env = env;
+            _activityLog = activityLog;
         }
 
         /// <summary>
@@ -47,10 +50,18 @@ namespace HRSupport.WebAPI.Controllers
                 return BadRequest(Result<LoginResponseDto>.Failure("E-posta ve şifre gerekli."));
             _logger.LogInformation("Login isteği alındı: {Email}", command.Email);
             var result = await _mediator.Send(command);
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var userAgent = HttpContext.Request.Headers.UserAgent.FirstOrDefault();
             if (result.IsSuccess)
+            {
                 _logger.LogInformation("Login başarılı: {Email}", result.Value?.Email);
+                await _activityLog.LogAsync(result.Value!.UserId, result.Value.UserType, "Login", null, null, true, "Giriş başarılı", ip, userAgent);
+            }
             else
+            {
                 _logger.LogWarning("Login başarısız: {Error}", result.Error);
+                await _activityLog.LogAsync(null, null, "LoginFailed", null, null, false, result.Error, ip, userAgent);
+            }
             return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 

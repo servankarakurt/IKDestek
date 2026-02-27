@@ -1,6 +1,11 @@
 namespace HRSupport.Application.Common
 {
-    public class Result<T>
+    public interface IResult
+    {
+        bool IsSuccess { get; }
+    }
+
+    public class Result<T> : IResult
     {
         public bool IsSuccess { get; private set; }
         public T? Value { get; private set; }

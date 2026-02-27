@@ -13,17 +13,20 @@ namespace HRSupport.Application.Features.Auth.Commands
         private readonly IUserRepository _userRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IInternRepository _internRepository;
+        private readonly IActivityLogService _activityLog;
 
         public ChangePasswordHandler(
             ICurrentUserService currentUser,
             IUserRepository userRepository,
             IEmployeeRepository employeeRepository,
-            IInternRepository internRepository)
+            IInternRepository internRepository,
+            IActivityLogService activityLog)
         {
             _currentUser = currentUser;
             _userRepository = userRepository;
             _employeeRepository = employeeRepository;
             _internRepository = internRepository;
+            _activityLog = activityLog;
         }
 
         public async Task<Result<bool>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
@@ -52,6 +55,7 @@ namespace HRSupport.Application.Features.Auth.Commands
                 user.PasswordHash = PasswordHelper.Hash(newPassword);
                 user.IsPasswordChangeRequired = false;
                 await _userRepository.UpdateAsync(user);
+                await _activityLog.LogAsync(userId, userType, "ChangePassword", "User", user.Id, true, "Şifre güncellendi");
                 return Result<bool>.Success(true, "Şifreniz güncellendi.");
             }
 
@@ -65,6 +69,7 @@ namespace HRSupport.Application.Features.Auth.Commands
                 employee.PasswordHash = PasswordHelper.Hash(newPassword);
                 employee.MustChangePassword = false;
                 await _employeeRepository.UpdateAsync(employee);
+                await _activityLog.LogAsync(userId, userType, "ChangePassword", "Employee", employee.Id, true, "Şifre güncellendi");
                 return Result<bool>.Success(true, "Şifreniz güncellendi.");
             }
 
@@ -78,6 +83,7 @@ namespace HRSupport.Application.Features.Auth.Commands
                 intern.PasswordHash = PasswordHelper.Hash(newPassword);
                 intern.MustChangePassword = false;
                 await _internRepository.UpdateAsync(intern);
+                await _activityLog.LogAsync(userId, userType, "ChangePassword", "Intern", intern.Id, true, "Şifre güncellendi");
                 return Result<bool>.Success(true, "Şifreniz güncellendi.");
             }
 
